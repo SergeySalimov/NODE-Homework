@@ -7,7 +7,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UIModule } from './ui/ui.module';
 import { VotesService } from './services/votes.service';
 import { HttpClientModule } from '@angular/common/http';
-import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 
 @NgModule({
   declarations: [
@@ -15,15 +14,13 @@ import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    BrowserAnimationsModule,
     UIModule,
   ],
   providers: [
     VotesService,
-    { provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }, multi: true },
-    { provide: STEPPER_GLOBAL_OPTIONS, useValue: { showError: true }, multi: true },
   ],
   bootstrap: [AppComponent]
 })
