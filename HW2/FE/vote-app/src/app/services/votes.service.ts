@@ -1,91 +1,46 @@
 import { Injectable } from '@angular/core';
-import { QuestionAfter, QuestionBefore } from '../interfaces/question';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, finalize, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { finalize, pluck } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-
-const questionsBefore: QuestionBefore[] = [
-  {
-    questionId: '1',
-    questionText: 'Будет ли что-то 1',
-    answers: [
-      { answerId: '1-1', answerText: 'да'},
-      { answerId: '1-2', answerText: 'нет'},
-      { answerId: '1-3', answerText: 'не знаю'},
-    ],
-  },
-  {
-    questionId: '2',
-    questionText: 'Будет ли что-то 2',
-    answers: [
-      { answerId: '2-1', answerText: 'да'},
-      { answerId: '2-2', answerText: 'нет'},
-      { answerId: '2-3', answerText: 'не знаю'},
-    ],
-  },
-  {
-    questionId: '3',
-    questionText: 'Будет ли что-то 3',
-    answers: [
-      { answerId: '3-1', answerText: 'да'},
-      { answerId: '3-2', answerText: 'нет'},
-      { answerId: '3-3', answerText: 'не знаю'},
-    ],
-  },
-];
-const questionsAfter: QuestionAfter[] = [
-  {
-    questionId: '1',
-    questionText: 'Будет ли что-то 1',
-    answers: [
-      { answerId: '1-1', answerText: 'да', answerCount: 5 },
-      { answerId: '1-2', answerText: 'нет', answerCount: 6 },
-      { answerId: '1-3', answerText: 'не знаю', answerCount: 3 },
-    ],
-  },
-  {
-    questionId: '2',
-    questionText: 'Будет ли что-то 2',
-    answers: [
-      { answerId: '2-1', answerText: 'да', answerCount: 11 },
-      { answerId: '2-2', answerText: 'нет', answerCount: 1 },
-      { answerId: '2-3', answerText: 'не знаю', answerCount: 2 },
-    ],
-  },
-  {
-    questionId: '3',
-    questionText: 'Будет ли что-то 3',
-    answers: [
-      { answerId: '3-1', answerText: 'да', answerCount: 5 },
-      { answerId: '3-2', answerText: 'нет', answerCount: 5 },
-      { answerId: '3-3', answerText: 'не знаю', answerCount: 4 },
-    ],
-  },
-];
+import { environment } from '../../environments/environment';
+import { QuestionVM, StatisticVM, VariantsVM } from '../interfaces/interfaces.vm';
+import { VoteDto } from '../interfaces/interfaces.dto';
 
 @Injectable()
 export class VotesService {
   $isLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isLoaded$: Observable<boolean> = this.$isLoaded.asObservable();
   
-  questions: QuestionBefore[];
+  constructor(private readonly http: HttpClient) {
+  }
   
-  constructor(private readonly http: HttpClient) {}
-  
-  getQuestions(): Observable<Array<QuestionBefore>> {
+  getQuestions(): Observable<QuestionVM[]> {
     this.$isLoaded.next(true);
-    // return this.http.get('http://178.172.195.18:7780');
-    
-    return of(questionsBefore).pipe(
-      delay(300),
+    return this.http.get<VariantsVM>(`${environment.backendServerUrl}/variants`).pipe(
+      pluck('data'),
       finalize(() => this.$isLoaded.next(false)),
     );
   }
   
-  getAnswers(): Observable<Array<QuestionAfter>> {
+  getStatistic(): Observable<Record<string, Record<string, number>>> {
     this.$isLoaded.next(true);
-    return of(questionsAfter).pipe(
-      delay(300),
+    
+    return this.http.get<StatisticVM>(`${environment.backendServerUrl}/stat`).pipe(
+      pluck('data'),
+      finalize(() => this.$isLoaded.next(false)),
+    );
+  }
+  
+  postVote(vote: VoteDto) {
+    this.$isLoaded.next(true);
+    // const mockData: VoteDto = {
+    //   answers: {
+    //     ['1']: '1-1',
+    //     ['2']: '2-1',
+    //     ['3']: '3-1',
+    //   },
+    // };
+    return this.http.post(`${environment.backendServerUrl}/vote`, vote).pipe(
       finalize(() => this.$isLoaded.next(false)),
     );
   }
