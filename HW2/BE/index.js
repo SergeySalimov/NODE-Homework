@@ -28,27 +28,28 @@ const questions = {
   data: [
     {
       questionId: 'q1',
-      questionText: 'Question 1',
+      questionText: 'Бейсбольная бита и мяч вместе стоят 1 доллар 10 центов. Бита дороже мяча на 1 доллар. Сколько стоит мяч?',
       answers: [
-        { answerId: 'a1-1', answerText: 'yes' },
-        { answerId: 'a1-2', answerText: 'no' },
+        { answerId: 'a1-1', answerText: '10 центов' },
+        { answerId: 'a1-2', answerText: 'Другое' },
+        { answerId: 'a1-3', answerText: 'Не знаю' },
       ],
     },
     {
       questionId: 'q2',
-      questionText: 'Question 2',
+      questionText: '5 машин за 5 минут производят 5 штуковин. Сколько времени понадобится 100 машинам, чтобы произвести 100 штуковин?',
       answers: [
-        { answerId: 'a2-1', answerText: 'yes' },
-        { answerId: 'a2-2', answerText: 'no' },
+        { answerId: 'a2-1', answerText: '100 минут' },
+        { answerId: 'a2-2', answerText: '5 минут' },
       ],
     },
     {
       questionId: 'q3',
-      questionText: 'Question 3',
+      questionText: 'Пруд зарастает кувшинками. Каждый день их площадь удваивается. Целиком озеро зарастет за 48 дней. За сколько дней цветы поглотят половину его поверхности?',
       answers: [
-        { answerId: 'a3-1', answerText: 'yes' },
-        { answerId: 'a3-2', answerText: 'no' },
-        { answerId: 'a3-3', answerText: 'maybe' },
+        { answerId: 'a3-1', answerText: '24' },
+        { answerId: 'a3-2', answerText: '47' },
+        { answerId: 'a3-3', answerText: 'не знаю' },
       ],
     },
   ],
@@ -57,18 +58,19 @@ const questions = {
 const statistic = {
   updated: new Date(),
   questionsData: [
-    { ['q1']: 'Question 1' },
-    { ['q2']: 'Question 2' },
-    { ['q3']: 'Question 3' },
+    { ['q1']: 'Бейсбольная бита и мяч вместе стоят 1 доллар 10 центов. Бита дороже мяча на 1 доллар. Сколько стоит мяч?' },
+    { ['q2']: '5 машин за 5 минут производят 5 штуковин. Сколько времени понадобится 100 машинам, чтобы произвести 100 штуковин?' },
+    { ['q3']: 'Пруд зарастает кувшинками. Каждый день их площадь удваивается. Целиком озеро зарастет за 48 дней. За сколько дней цветы поглотят половину его поверхности?' },
   ],
   answersData: [
-    { ['a1-1']: 'yes' },
-    { ['a1-2']: 'no' },
-    { ['a2-1']: 'yes' },
-    { ['a2-2']: 'no' },
-    { ['a3-1']: 'yes' },
-    { ['a3-2']: 'no' },
-    { ['a3-3']: 'maybe' },
+    { ['a1-1']: '10 центов' },
+    { ['a1-2']: 'Другое' },
+    { ['a1-3']: 'Не знаю' },
+    { ['a2-1']: '100 минут' },
+    { ['a2-2']: '5 минут' },
+    { ['a3-1']: '24' },
+    { ['a3-2']: '47' },
+    { ['a3-3']: 'не знаю' },
   ],
   data: {
     ['q1']: {
