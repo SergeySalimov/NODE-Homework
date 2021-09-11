@@ -17,5 +17,7 @@ export interface VariantsVM {
 
 export interface StatisticVM {
   updated: Date;
+  questionsData: Record<string, string>[],
+  answersData: Record<string, string>[],
   data: Record<string, Record<string, number>>,
 }

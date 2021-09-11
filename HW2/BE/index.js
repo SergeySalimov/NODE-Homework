@@ -27,28 +27,28 @@ const questions = {
   created: new Date(),
   data: [
     {
-      questionId: '1',
+      questionId: 'q1',
       questionText: 'Question 1',
       answers: [
-        { answerId: '1-1', answerText: 'yes' },
-        { answerId: '1-2', answerText: 'no' },
+        { answerId: 'a1-1', answerText: 'yes' },
+        { answerId: 'a1-2', answerText: 'no' },
       ],
     },
     {
-      questionId: '2',
+      questionId: 'q2',
       questionText: 'Question 2',
       answers: [
-        { answerId: '2-1', answerText: 'yes' },
-        { answerId: '2-2', answerText: 'no' },
+        { answerId: 'a2-1', answerText: 'yes' },
+        { answerId: 'a2-2', answerText: 'no' },
       ],
     },
     {
-      questionId: '3',
+      questionId: 'q3',
       questionText: 'Question 3',
       answers: [
-        { answerId: '3-1', answerText: 'yes' },
-        { answerId: '3-2', answerText: 'no' },
-        { answerId: '3-3', answerText: 'maybe' },
+        { answerId: 'a3-1', answerText: 'yes' },
+        { answerId: 'a3-2', answerText: 'no' },
+        { answerId: 'a3-3', answerText: 'maybe' },
       ],
     },
   ],
@@ -56,19 +56,33 @@ const questions = {
 
 const statistic = {
   updated: new Date(),
+  questionsData: [
+    { ['q1']: 'Question 1' },
+    { ['q2']: 'Question 2' },
+    { ['q3']: 'Question 3' },
+  ],
+  answersData: [
+    { ['a1-1']: 'yes' },
+    { ['a1-2']: 'no' },
+    { ['a2-1']: 'yes' },
+    { ['a2-2']: 'no' },
+    { ['a3-1']: 'yes' },
+    { ['a3-2']: 'no' },
+    { ['a3-3']: 'maybe' },
+  ],
   data: {
-    ['1']: {
-      ['1-1']: 0,
-      ['1-2']: 0,
+    ['q1']: {
+      ['a1-1']: 0,
+      ['a1-2']: 0,
     },
-    ['2']: {
-      ['2-1']: 0,
-      ['2-2']: 0,
+    ['q2']: {
+      ['a2-1']: 0,
+      ['a2-2']: 0,
     },
-    ['3']: {
-      ['3-1']: 0,
-      ['3-2']: 0,
-      ['3-3']: 0,
+    ['q3']: {
+      ['a3-1']: 0,
+      ['a3-2']: 0,
+      ['a3-3']: 0,
     },
   },
 };

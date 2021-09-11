@@ -11,7 +11,6 @@ import { RouterModule } from '@angular/router';
 import { LoaderComponent } from './shared/loader/loader.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatStepperModule } from '@angular/material/stepper';
-import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 
 @NgModule({
   declarations: [
@@ -39,10 +38,6 @@ import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
     StatisticPageComponent,
     NotFoundPageComponent,
     LoaderComponent,
-  ],
-  providers: [
-    { provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }, multi: true },
-    { provide: STEPPER_GLOBAL_OPTIONS, useValue: { showError: true }, multi: true },
   ],
 })
 export class UIModule {

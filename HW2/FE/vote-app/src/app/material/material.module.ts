@@ -16,6 +16,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 
 const materialModules = [
   MatSidenavModule,
@@ -35,6 +36,7 @@ const materialModules = [
   MatSlideToggleModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
+  MatSelectModule,
 ];
 
 @NgModule({

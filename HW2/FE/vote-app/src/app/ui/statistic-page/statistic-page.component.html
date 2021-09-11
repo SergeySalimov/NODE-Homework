@@ -1,1 +1,16 @@
-<p>statistic-page works!</p>
+<div class="container">
+  <div class="row">
+    <h2 class="text-center my-4">Статистика ответов</h2>
+
+    <div class="col-4" *ngFor="let question of questionsFromStatistic$ | async">
+      <h4 class="text-center mb-3">{{question.questionName}}</h4>
+      <ul>
+        <li *ngFor="let answer of question.questionData">
+          {{answer.answerName}} - {{answer.count}}
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
