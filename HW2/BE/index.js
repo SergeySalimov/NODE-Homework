@@ -41,6 +41,7 @@ const questions = {
       answers: [
         { answerId: 'a2-1', answerText: '100 минут' },
         { answerId: 'a2-2', answerText: '5 минут' },
+        { answerId: 'a2-3', answerText: 'Не знаю' },
       ],
     },
     {
@@ -49,7 +50,7 @@ const questions = {
       answers: [
         { answerId: 'a3-1', answerText: '24' },
         { answerId: 'a3-2', answerText: '47' },
-        { answerId: 'a3-3', answerText: 'не знаю' },
+        { answerId: 'a3-3', answerText: 'Не знаю' },
       ],
     },
   ],
@@ -68,18 +69,21 @@ const statistic = {
     { ['a1-3']: 'Не знаю' },
     { ['a2-1']: '100 минут' },
     { ['a2-2']: '5 минут' },
+    { ['a2-3']: 'Не знаю' },
     { ['a3-1']: '24' },
     { ['a3-2']: '47' },
-    { ['a3-3']: 'не знаю' },
+    { ['a3-3']: 'Не знаю' },
   ],
   data: {
     ['q1']: {
       ['a1-1']: 0,
       ['a1-2']: 0,
+      ['a1-3']: 0,
     },
     ['q2']: {
       ['a2-1']: 0,
       ['a2-2']: 0,
+      ['a2-3']: 0,
     },
     ['q3']: {
       ['a3-1']: 0,
