@@ -1,0 +1,16 @@
+{
+  "questions": [
+    {
+      "id": "id-for-question1",
+      "name": "Dog"
+    },
+    {
+      "id": "id-for-question2",
+      "name": "Cat"
+    },
+    {
+      "id": "id-for-question3",
+      "name": "Bird"
+    }
+  ]
+}
