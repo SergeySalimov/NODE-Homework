@@ -20,7 +20,8 @@ webServer.set('view engine', 'handlebars');
 webServer.set('views', path.join(viewsDirectoryPath));
 
 webServer.use(express.urlencoded({ extended: true }));
-webServer.use(helmet());
+webServer.use(express.json({ extended: true }));
+
 webServer.use(express.static(staticPath));
 webServer.use((req, res, next) => {
   logLineAsync(`[${PORT}] render dynamic page, original url=${req.originalUrl}`, logPath);
