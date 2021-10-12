@@ -1,0 +1,18 @@
+<div class="d-flex justify-content-center">
+    <form action="/vote" class="form" method="post">
+        {{#each question}}
+        <input type="radio"
+               value="{{this.id}}"
+               class="btn-check"
+               name="answer"
+               id="{{this.id}}"
+               autocomplete="off"
+               {{#if @first}}checked{{/if}}
+        >
+        <label class="btn btn-outline-secondary mx-3" for="{{this.id}}">{{this.name}}</label>
+        {{/each}}
+
+        <input type="submit" id="submit-button" class="d-none">
+        <label class="btn btn-success mx-3" for="submit-button">Make your choice</label>
+    </form>
+</div>
