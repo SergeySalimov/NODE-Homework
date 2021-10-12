@@ -29,6 +29,9 @@ webServer.use((req, res, next) => {
 });
 
 webServer.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Cache-Control','public, max-age=60');
+  
   res.render(
     'home-page',
     {
@@ -45,7 +48,8 @@ webServer.get('/variants', (req, res) => {
   const questionsArr = JSON.parse(questionsJson);
   const { question } = questionsArr;
   
-  res.setHeader("Cache-Control","public, max-age=60");
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Cache-Control','public, max-age=60');
   
   res.render(
     'variants-page',
@@ -73,7 +77,8 @@ webServer.get('/stat', (req, res) => {
     name: question.filter(q => q.id === r.id)[0].name || 'No name',
   }));
   
-  res.setHeader("Cache-Control","private, max-age=0");
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Cache-Control','private, max-age=0');
   
   res.render(
     'statistic-page',
@@ -91,11 +96,11 @@ webServer.get('/stat', (req, res) => {
 webServer.post('/vote', (req, res, next) => {
   try {
     const answer = req.body.answer;
-    
     const resultsJson = fs.readFileSync(resultsPath, 'utf-8');
     const resultsArr = JSON.parse(resultsJson);
-  
     let indexOfAnswerInResults = resultsArr.results.findIndex(result => result.id === answer);
+    
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
   
     if (indexOfAnswerInResults === -1) {
       res.render(
@@ -112,6 +117,7 @@ webServer.post('/vote', (req, res, next) => {
   
       fs.writeFileSync(resultsPath, JSON.stringify(resultsArr), 'utf-8');
       logLineAsync(`[${PORT}] write answer in ${resultsPath}`, logPath);
+    
       res.render(
         'thanks-page',
         {
@@ -134,6 +140,9 @@ webServer.post('/vote', (req, res, next) => {
 });
 
 webServer.get('*', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.setHeader('Cache-Control','private, max-age=0');
+  
   res.render(
     'error-page',
     {
