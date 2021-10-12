@@ -8,3 +8,4 @@
 _nodemon.log
 nginx_caches/
 **/dist
+/hw3095/results.json
