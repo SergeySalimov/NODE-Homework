@@ -7,6 +7,8 @@ const { statisticFromScratch } = require('./statistic-start-data');
 const webServer = express();
 const PORT = 7781;
 const logPath = path.join(__dirname, '_server.log');
+const questionsPath = path.join(__dirname, 'data/questions.json');
+const statisticPath = path.join(__dirname, 'data/statistic.json');
 
 webServer.use(express.urlencoded({ extended: true }));
 webServer.use(express.json({ extended: true }));
@@ -16,83 +18,14 @@ webServer.use((req, res, next) => {
 });
 webServer.use(express.static(process.cwd() + '/vote-app/dist/vote-app/'));
 
-const questions = {
-  _id: 'someId',
-  created: new Date(),
-  data: [
-    {
-      questionId: 'q1',
-      questionText: 'Бейсбольная бита и мяч вместе стоят 1 доллар 10 центов. Бита дороже мяча на 1 доллар. Сколько стоит мяч?',
-      answers: [
-        { answerId: 'a1-1', answerText: '10 центов' },
-        { answerId: 'a1-2', answerText: 'Другое' },
-        { answerId: 'a1-3', answerText: 'Не знаю' },
-      ],
-    },
-    {
-      questionId: 'q2',
-      questionText: '5 машин за 5 минут производят 5 штуковин. Сколько времени понадобится 100 машинам, чтобы произвести 100 штуковин?',
-      answers: [
-        { answerId: 'a2-1', answerText: '100 минут' },
-        { answerId: 'a2-2', answerText: '5 минут' },
-        { answerId: 'a2-3', answerText: 'Не знаю' },
-      ],
-    },
-    {
-      questionId: 'q3',
-      questionText: 'Пруд зарастает кувшинками. Каждый день их площадь удваивается. Целиком озеро зарастет за 48 дней. За сколько дней цветы поглотят половину его поверхности?',
-      answers: [
-        { answerId: 'a3-1', answerText: '24' },
-        { answerId: 'a3-2', answerText: '47' },
-        { answerId: 'a3-3', answerText: 'Не знаю' },
-      ],
-    },
-  ],
-};
-
-const statistic = {
-  updated: new Date(),
-  questionsData: [
-    { ['q1']: 'Бейсбольная бита и мяч вместе стоят 1 доллар 10 центов. Бита дороже мяча на 1 доллар. Сколько стоит мяч?' },
-    { ['q2']: '5 машин за 5 минут производят 5 штуковин. Сколько времени понадобится 100 машинам, чтобы произвести 100 штуковин?' },
-    { ['q3']: 'Пруд зарастает кувшинками. Каждый день их площадь удваивается. Целиком озеро зарастет за 48 дней. За сколько дней цветы поглотят половину его поверхности?' },
-  ],
-  answersData: [
-    { ['a1-1']: '10 центов' },
-    { ['a1-2']: 'Другое' },
-    { ['a1-3']: 'Не знаю' },
-    { ['a2-1']: '100 минут' },
-    { ['a2-2']: '5 минут' },
-    { ['a2-3']: 'Не знаю' },
-    { ['a3-1']: '24' },
-    { ['a3-2']: '47' },
-    { ['a3-3']: 'Не знаю' },
-  ],
-  data: {
-    ['q1']: {
-      ['a1-1']: 0,
-      ['a1-2']: 0,
-      ['a1-3']: 0,
-    },
-    ['q2']: {
-      ['a2-1']: 0,
-      ['a2-2']: 0,
-      ['a2-3']: 0,
-    },
-    ['q3']: {
-      ['a3-1']: 0,
-      ['a3-2']: 0,
-      ['a3-3']: 0,
-    },
-  },
-};
-
 webServer.get('/api/variants', (req, res) => {
+  const questionsJson = fs.readFileSync(questionsPath, 'utf-8');
+  
   res.setHeader('Cache-Control','public, max-age=60');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify(questions));
+  res.send(questionsJson);
 });
 
 webServer.get('/api/stat', (req, res) => {
@@ -101,9 +34,16 @@ webServer.get('/api/stat', (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
   
-  logLineAsync(`[${PORT}] statistic was send ${statistic}`, logPath);
-  
-  res.send(JSON.stringify(statistic));
+  try {
+    const statisticJson = fs.readFileSync(statisticPath, 'utf-8');
+    logLineAsync(`[${PORT}] statistic was send`, logPath);
+    
+    res.send(statisticJson);
+  } catch (e) {
+    logLineAsync(`[${PORT}] statistic was send from ZERO file`, logPath);
+    
+    res.send(JSON.stringify(statisticFromScratch));
+  }
 });
 
 webServer.options('/api/vote', (req, res) => {
@@ -114,6 +54,14 @@ webServer.options('/api/vote', (req, res) => {
 
 webServer.post('/api/vote', (req, res) => {
   const voteData = req.body.answers;
+  let statistic;
+  try {
+    const statisticJson = fs.readFileSync(statisticPath, 'utf-8');
+    statistic = JSON.parse(statisticJson);
+  } catch (e) {
+    logLineAsync(`[${PORT}] first save of statistic, got it from SCRATCH`, logPath);
+    statistic = { ...statisticFromScratch };
+  }
   
   if (voteData) {
     for (const [questionId, answerId] of Object.entries(voteData)) {
@@ -125,13 +73,14 @@ webServer.post('/api/vote', (req, res) => {
         res.status(400).end();
       }
     }
-    logLineAsync(`[${PORT}] /vote data handled`, logPath);
+    logLineAsync(`[${PORT}] /vote data updated`, logPath);
   } else {
     logLineAsync(`[${PORT}] /vote ERROR 400, bad data in request`, logPath);
     res.status(400).end();
   }
   
-  logLineAsync(`[${PORT}] statistic was send ${statistic}`, logPath);
+  fs.writeFileSync(statisticPath, JSON.stringify(statistic), 'utf-8');
+  logLineAsync(`[${PORT}] vote was successfully added`, logPath);
   
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -139,7 +88,7 @@ webServer.post('/api/vote', (req, res) => {
   res.send('successfully added!');
 });
 
-webServer.get('/', (req, res) => {
+webServer.get('*', (req, res) => {
   res.sendFile(process.cwd() + '/vote-app/dist/vote-app/index.html');
 });
 
