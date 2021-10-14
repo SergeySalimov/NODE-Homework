@@ -88,6 +88,7 @@ const statistic = {
 };
 
 webServer.get('/api/variants', (req, res) => {
+  res.setHeader('Cache-Control','public, max-age=60');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
@@ -95,6 +96,7 @@ webServer.get('/api/variants', (req, res) => {
 });
 
 webServer.get('/api/stat', (req, res) => {
+  res.setHeader('Cache-Control','private, max-age=0');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
