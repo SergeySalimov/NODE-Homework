@@ -1,26 +1,19 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-const os = require('os');
+// const fs = require('fs');
+// const os = require('os');
+const { logLineAsync } = require('../share/loggers');
 
 const webServer = express();
+const PORT = 7781;
+const logPath = path.join(__dirname, '_server.log');
 
 webServer.use(express.urlencoded({ extended: true }));
 webServer.use(express.json({ extended: true }));
-
-const PORT = 7780;
-const logPath = path.join(__dirname, '_server.log');
-
-function logLineSync(logMessage, logFilePath = logPath) {
-  const logDT = new Date();
-  const fullLog = `${logDT.toLocaleDateString()} ${logDT.toLocaleTimeString()} ${logMessage}`;
-
-  console.log(fullLog);
-
-  const logFd = fs.openSync(logFilePath, 'a+');
-  fs.writeFileSync(logFd, fullLog + os.EOL);
-  fs.closeSync(logFd);
-}
+webServer.use((req, res, next) => {
+  logLineAsync(`[${PORT}] url=${req.originalUrl} called`, logPath);
+  next();
+});
 
 const questions = {
   _id: 'someId',
@@ -93,39 +86,32 @@ const statistic = {
   },
 };
 
-webServer.get('/variants', (req, res) => {
-  logLineSync(`${PORT} /variants called`);
-  
+webServer.get('/api/variants', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(questions));
 });
 
-webServer.get('/stat', (req, res) => {
-  logLineSync(`${PORT} /stat called`);
-  
+webServer.get('/api/stat', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
   
-  console.log('statistic was send', statistic);
+  logLineAsync(`[${PORT}] statistic was send ${statistic}`, logPath);
   
   res.send(JSON.stringify(statistic));
 });
 
-webServer.options('/vote', (req, res) => {
-  logLineSync(`${PORT} /vote preflight called`);
-
+webServer.options('/api/vote', (req, res) => {
+  // ToDo check preflight in req
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.send('');
 });
 
-webServer.post('/vote', (req, res) => {
+webServer.post('/api/vote', (req, res) => {
   const voteData = req.body.answers;
-  
-  logLineSync(`${PORT} /vote called`);
   
   if (voteData) {
     for (const [questionId, answerId] of Object.entries(voteData)) {
@@ -133,17 +119,17 @@ webServer.post('/vote', (req, res) => {
         statistic.data[questionId][answerId]++;
         statistic.updated = new Date();
       } catch (e) {
-        logLineSync(`${PORT} handle data error`);
+        logLineAsync(`[${PORT}] handle data error`, logPath);
         res.status(400).end();
       }
     }
-    logLineSync(`${PORT} /vote data handled`);
+    logLineAsync(`[${PORT}] /vote data handled`, logPath);
   } else {
-    logLineSync(`${PORT} /vote ERROR 400, bad data in request`);
+    logLineAsync(`[${PORT}] /vote ERROR 400, bad data in request`, logPath);
     res.status(400).end();
   }
   
-  console.log('statistic was changed', statistic);
+  logLineAsync(`[${PORT}] statistic was send ${statistic}`, logPath);
   
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -152,5 +138,5 @@ webServer.post('/vote', (req, res) => {
 });
 
 webServer.listen(PORT, () => {
-  logLineSync(`Backend server has been started on port ${PORT} in ${process.env.NODE_ENV} mode ......`);
+  logLineAsync(`Backend server has been started on port ${PORT} in ${process.env.NODE_ENV} mode ......`, logPath);
 });

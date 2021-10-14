@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="row">
+    <h2 class="text-center my-5">Ответьте пожалуйста на вопросы</h2>
+    <div class="col-12">
+
+      <mat-vertical-stepper [linear]="false" #stepper>
+        <mat-step *ngFor="let question of questions;  let first = first"
+                  [stepControl]="form.get(question.questionId)"
+                  [errorMessage]="errorMessage"
+        >
+          <form [formGroup]="form">
+            <ng-template matStepLabel>{{question.questionText}}</ng-template>
+            <mat-form-field>
+              <mat-label>Выберите Ваш ответ</mat-label>
+              <mat-select [formControlName]="question.questionId" aria-label="Выберите ответ" required>
+                <mat-option *ngFor="let answer of question.answers" [value]="answer.answerId">
+                  {{answer.answerText}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div>
+              <button *ngIf="!first" mat-button matStepperPrevious>Назад</button>
+              <button mat-button matStepperNext>Дальше</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Готово</ng-template>
+          <p [style.color]="form.invalid ? 'red' : 'inherit'">
+            {{form.invalid ? 'Ответьте пожалуйста на все вопросы' : 'Все сделано'}}
+          </p>
+          <div>
+            <button mat-button [disabled]="form.invalid" (click)="onSubmit()">Отправить</button>
+            <button mat-button (click)="stepper.reset()">Сброс</button>
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+    </div>
+  </div>
+</div>
