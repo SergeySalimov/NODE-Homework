@@ -14,6 +14,7 @@ webServer.use((req, res, next) => {
   logLineAsync(`[${PORT}] url=${req.originalUrl} called`, logPath);
   next();
 });
+webServer.use(express.static(process.cwd() + '/vote-app/dist/vote-app/'));
 
 const questions = {
   _id: 'someId',
@@ -104,7 +105,6 @@ webServer.get('/api/stat', (req, res) => {
 });
 
 webServer.options('/api/vote', (req, res) => {
-  // ToDo check preflight in req
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.send('');
@@ -135,6 +135,10 @@ webServer.post('/api/vote', (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
   res.send('successfully added!');
+});
+
+webServer.get('/', (req, res) => {
+  res.sendFile(process.cwd() + '/vote-app/dist/vote-app/index.html');
 });
 
 webServer.listen(PORT, () => {
