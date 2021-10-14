@@ -8,6 +8,7 @@ import { VoteDto } from '../interfaces/interfaces.dto';
 @Injectable()
 export class VotesService {
   $isLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  isLoaded$: Observable<boolean> = this.$isLoaded.asObservable();
   
   rootURL = '/api';
   
