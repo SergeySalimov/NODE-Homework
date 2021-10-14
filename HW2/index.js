@@ -1,8 +1,8 @@
 const express = require('express');
 const path = require('path');
-// const fs = require('fs');
-// const os = require('os');
+const fs = require('fs');
 const { logLineAsync } = require('../share/loggers');
+const { statisticFromScratch } = require('./statistic-start-data');
 
 const webServer = express();
 const PORT = 7781;
