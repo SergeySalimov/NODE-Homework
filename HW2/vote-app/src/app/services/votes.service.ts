@@ -2,21 +2,20 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { finalize, pluck } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
 import { QuestionVM, StatisticVM, VariantsVM } from '../interfaces/interfaces.vm';
 import { VoteDto } from '../interfaces/interfaces.dto';
 
 @Injectable()
 export class VotesService {
   $isLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  isLoaded$: Observable<boolean> = this.$isLoaded.asObservable();
   
-  constructor(private readonly http: HttpClient) {
-  }
+  rootURL = '/api';
+  
+  constructor(private readonly http: HttpClient) {}
   
   getQuestions(): Observable<QuestionVM[]> {
     this.$isLoaded.next(true);
-    return this.http.get<VariantsVM>(`${environment.backendServerUrl}/variants`).pipe(
+    return this.http.get<VariantsVM>(`${this.rootURL}/variants`).pipe(
       pluck('data'),
       finalize(() => this.$isLoaded.next(false)),
     );
@@ -25,7 +24,7 @@ export class VotesService {
   getStatistic(): Observable<StatisticVM> {
     this.$isLoaded.next(true);
     
-    return this.http.get<StatisticVM>(`${environment.backendServerUrl}/stat`).pipe(
+    return this.http.get<StatisticVM>(`${this.rootURL}/stat`).pipe(
       finalize(() => this.$isLoaded.next(false)),
     );
   }
@@ -33,7 +32,7 @@ export class VotesService {
   postVote(vote: VoteDto) {
     this.$isLoaded.next(true);
     
-    return this.http.post(`${environment.backendServerUrl}/vote`, vote, {
+    return this.http.post(`${this.rootURL}/vote`, vote, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
