@@ -1,5 +1,5 @@
 <div class="container">
-  <div class="row">
+  <div class="row justify-content-center">
     <h2 class="text-center my-4">Статистика ответов</h2>
 
     <div class="col-4" *ngFor="let question of questionsFromStatistic$ | async">
@@ -11,6 +11,16 @@
           {{answer.answerName}} - {{answer.count}}
         </li>
       </ul>
+    </div>
+
+    <div class="show-statistic-file col-9 mt-4 mb-2">
+      <button mat-stroked-button color="primary" (click)="showTextArea = !showTextArea">
+        {{showTextArea ? 'Hide' : 'Show'}} statistic in Json format
+      </button>
+
+      <textarea *ngIf="showTextArea" class="statistic-file my-4">
+        {{statistics$ | async | json}}
+      </textarea>
     </div>
 
   </div>

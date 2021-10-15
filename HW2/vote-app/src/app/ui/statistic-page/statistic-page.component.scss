@@ -1,0 +1,18 @@
+:host {
+  .show-statistic-file {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    button {
+      width: 24rem;
+    }
+
+    .statistic-file {
+      min-width: 36rem;
+      min-height: 24rem;
+      border: 1px solid darkblue;
+    }
+  }
+}
