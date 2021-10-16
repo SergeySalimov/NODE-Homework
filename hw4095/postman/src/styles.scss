@@ -3,6 +3,15 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+$grid-breakpoints: (
+  xs: 0,
+  minsm: 460px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+) !default;
+
 :root {
   --header-height: 62px;
   --footer-height: 56px;
