@@ -1,8 +1,23 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+import { HomePageComponent } from './ui/home-page/home-page.component';
+import { NotFoundPageComponent } from './ui/not-found-page/not-found-page.component';
+import { WorkPageComponent } from './ui/work-page/work-page.component';
 
-
-const routes: Routes = [];
+const routes: Routes = [
+  {
+    path: '', redirectTo: 'work', pathMatch: 'full',
+  },
+  {
+    path: 'home', component: HomePageComponent,
+  },
+  {
+    path: 'work', component: WorkPageComponent,
+  },
+  {
+    path: '**', component: NotFoundPageComponent,
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

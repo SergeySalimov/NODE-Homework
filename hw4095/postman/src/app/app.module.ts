@@ -4,17 +4,24 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { UIModule } from './ui/ui.module';
+import { VotesService } from './services/votes.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
     AppRoutingModule,
-    BrowserAnimationsModule
+    UIModule,
   ],
-  providers: [],
+  providers: [
+    VotesService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

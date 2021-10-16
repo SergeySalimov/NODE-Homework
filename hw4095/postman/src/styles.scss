@@ -2,3 +2,14 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+:root {
+  --header-height: 62px;
+  --footer-height: 56px;
+  --main-height: calc(100vh - (62px + 56px));
+  --sidenav-width: 250px;
+
+  --main-base: #673ab7;
+  --main-white: white;
+  --main-gray: lightgray;
+}
