@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const { logLineAsync } = require('../share/loggers');
 
+process.title = 'formApp';
 const app = express();
 
 const PORT = 7780;
