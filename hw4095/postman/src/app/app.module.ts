@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UIModule } from './ui/ui.module';
-import { VotesService } from './services/votes.service';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
@@ -19,9 +18,7 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     UIModule,
   ],
-  providers: [
-    VotesService,
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

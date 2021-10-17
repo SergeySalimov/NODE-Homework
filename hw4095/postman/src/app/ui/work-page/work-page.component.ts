@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RequestForm } from '../../interfaces/interfaces.vm';
 
 @Component({
   selector: 'app-work-page',
@@ -7,11 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WorkPageComponent implements OnInit {
   showHistory = false;
-  selected = 'GET';
-
-  constructor() { }
-
+  disableSendRequest = true;
+  
+  constructor() {
+  }
+  
   ngOnInit(): void {
   }
-
+  
+  sendRequest(data: RequestForm) {
+    console.log(data);
+    
+  }
+  
 }

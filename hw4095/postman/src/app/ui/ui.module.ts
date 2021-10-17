@@ -10,6 +10,7 @@ import { LoaderComponent } from './shared/loader/loader.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatStepperModule } from '@angular/material/stepper';
 import { WorkPageComponent } from './work-page/work-page.component';
+import { RequestBlockComponent } from './work-page/request-block/request-block.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { WorkPageComponent } from './work-page/work-page.component';
     NotFoundPageComponent,
     LoaderComponent,
     WorkPageComponent,
+    RequestBlockComponent,
   ],
   imports: [
     CommonModule,

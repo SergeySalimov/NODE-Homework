@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { VotesService } from '../../../services/votes.service';
 
 @Component({
   selector: 'app-loader',
@@ -7,5 +6,5 @@ import { VotesService } from '../../../services/votes.service';
   styleUrls: ['./loader.component.scss']
 })
 export class LoaderComponent {
-  constructor(public votesService: VotesService) { }
+  // constructor(public votesService: VotesService) { }
 }
