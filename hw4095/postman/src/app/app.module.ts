@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UIModule } from './ui/ui.module';
 import { HttpClientModule } from '@angular/common/http';
+import { PostmanService } from './services/postman.service';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     UIModule,
   ],
-  providers: [],
+  providers: [PostmanService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

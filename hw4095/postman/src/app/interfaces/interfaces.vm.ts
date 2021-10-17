@@ -1,6 +1,6 @@
 import { RequestTypeEnum } from './constant';
 
-export interface HeadersInterface {
+export interface HeaderInterface {
   key: string;
   value: string;
 }
@@ -8,6 +8,6 @@ export interface HeadersInterface {
 export interface RequestForm {
   url: string;
   type: RequestTypeEnum;
-  headers: HeadersInterface;
+  headers: HeaderInterface[];
   body: string;
 }

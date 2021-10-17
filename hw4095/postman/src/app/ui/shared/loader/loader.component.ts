@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PostmanService } from '../../../services/postman.service';
 
 @Component({
   selector: 'app-loader',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./loader.component.scss']
 })
 export class LoaderComponent {
-  // constructor(public votesService: VotesService) { }
+  constructor(public postmanService: PostmanService) { }
 }
