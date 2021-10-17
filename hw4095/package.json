@@ -9,7 +9,7 @@
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "prod": "npm install --only=prod && cross-env NODE_ENV=production node index.js &",
     "start-prod": "cross-env NODE_ENV=production node index.js &",
-    "stop": "pkill --signal SIGINT formApp"
+    "stop": "pkill --signal SIGINT postmanApp"
   },
   "keywords": [],
   "author": "",
