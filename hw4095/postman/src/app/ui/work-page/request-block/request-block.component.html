@@ -14,8 +14,8 @@
     </mat-form-field>
   </div>
 
-  <div formArrayName="headers" class="header-block">
-    <div class="headers-text">Headers</div>
+  <div formArrayName="headers" class="header-block material-block">
+    <div class="material-title">Headers</div>
 
     <ng-container *ngFor="let header of headers.controls; let i = index">
       <div [formGroupName]="i" class="one-header-block">

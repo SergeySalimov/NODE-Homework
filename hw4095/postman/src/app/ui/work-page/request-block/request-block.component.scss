@@ -31,21 +31,6 @@
     .header-block {
       flex-direction: column;
       gap: 5px;
-      border: 1px solid rgba(0,0,0,.2);
-      border-radius: 4px;
-      padding: 10px;
-      position: relative;
-
-      .headers-text {
-        position: absolute;
-        display: block;
-        transform: translateY(-1.59375em) scale(.75);
-        top: 0.84375em;
-        left: 0;
-        background-color: white;
-        padding-right: 7px;
-        padding-left: 7px;
-      }
 
       .one-header-block {
         flex-direction: row;
