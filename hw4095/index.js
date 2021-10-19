@@ -66,8 +66,8 @@ webServer.post('/api/request', async (req, res) => {
   res.send(JSON.stringify(response));
 });
 
-webServer.get('*', (res, req) => {
-  res.sendFile(process.cwd() + pathToAppDist);
+webServer.get('*', (req, res) => {
+  res.sendFile(process.cwd() + pathToAppDist + 'index.html');
 });
 
 webServer.listen(PORT, () => {
