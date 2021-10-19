@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatStepperModule } from '@angular/material/stepper';
 import { WorkPageComponent } from './work-page/work-page.component';
 import { RequestBlockComponent } from './work-page/request-block/request-block.component';
+import { ResponseBlockComponent } from './work-page/response-block/response-block.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { RequestBlockComponent } from './work-page/request-block/request-block.c
     LoaderComponent,
     WorkPageComponent,
     RequestBlockComponent,
+    ResponseBlockComponent,
   ],
   imports: [
     CommonModule,

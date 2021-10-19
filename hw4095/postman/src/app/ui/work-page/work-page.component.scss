@@ -1,6 +1,10 @@
 @import "~src/styles";
 
 :host {
+  .container {
+    padding-bottom: calc(var(--footer-height) + 10px);
+  }
+
   .h2 {
     background-color: var(--main-gray);
   }

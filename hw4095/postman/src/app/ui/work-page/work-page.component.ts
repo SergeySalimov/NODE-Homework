@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestForm } from '../../interfaces/interfaces.vm';
 import { PostmanService } from '../../services/postman.service';
-import { RequestDto } from '../../interfaces/interfaces.dto';
+import { RequestDto, ResponseDto } from '../../interfaces/interfaces.dto';
 import { WorkPageHelper } from './work-page.helper';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-work-page',
@@ -12,6 +13,7 @@ import { WorkPageHelper } from './work-page.helper';
 export class WorkPageComponent implements OnInit {
   showHistory = false;
   disableSendRequest = true;
+  request$: Observable<ResponseDto>;
   
   constructor(public postmanService: PostmanService) {}
   
@@ -21,9 +23,6 @@ export class WorkPageComponent implements OnInit {
   sendRequest(data: RequestForm) {
     const req: RequestDto = WorkPageHelper.translateFormDataToRequestDto(data);
     
-    this.postmanService.sendRequest(req).subscribe(data => {
-      console.log(data);
-    });
+    this.request$ = this.postmanService.sendRequest(req);
   }
-  
 }
