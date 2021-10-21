@@ -7,7 +7,7 @@
   <ng-template #answer>
     <div class="material-block">
       <div class="material-title">Url</div>
-      <span class="display-4" style="font-size: 1.2rem">{{response?.url}}</span>
+      <span class="display-4 break-word" style="font-size: 1.2rem">{{response?.url}}</span>
     </div>
 
     <div class="material-block status">
@@ -20,21 +20,21 @@
 
     <div class="material-block">
       <div class="material-title">Content-type</div>
-      <span class="display-4" style="font-size: 1.2rem">{{response?.contentType}}</span>
+      <span class="display-4 break-word" style="font-size: 1.2rem">{{response?.contentType}}</span>
     </div>
 
     <div class="material-block">
       <div class="material-title">Headers</div>
-      <div *ngFor="let header of response?.headers" class="display-4" style="font-size: 1rem">
-        {{header}}
+      <div *ngFor="let header of response?.headers" class="display-4 break-word" style="font-size: 1rem">
+        <b>{{header.split(':')[0] | titlecase}}:</b>{{header.split(':')[1]}}
       </div>
     </div>
 
     <div class="material-block">
       <div class="material-title">Response text</div>
-      <div *ngFor="let line of responseText" class="display-4" style="font-size: 0.8rem">
+      <span *ngFor="let line of responseText" class="display-4 break-word" style="font-size: 0.8rem">
         {{line}}
-      </div>
+      </span>
     </div>
   </ng-template>
 </div>

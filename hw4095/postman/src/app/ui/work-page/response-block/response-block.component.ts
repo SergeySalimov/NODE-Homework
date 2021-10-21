@@ -28,8 +28,6 @@ export class ResponseBlockComponent implements OnInit {
   }
   
   get responseText(): string[] {
-    console.log(this.response?.responseText);
-  
     return this.response?.responseText.split('\n') || [];
   }
   
