@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { logLineAsync } = require('../share/loggers');
+const { logLineAsync } = require('../share/helper');
 const { statisticFromScratch } = require('./statistic-start-data');
 
 const webServer = express();

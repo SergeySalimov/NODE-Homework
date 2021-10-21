@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
 const handlebars = require('handlebars');
-const { logLineAsync } = require('../share/loggers');
+const { logLineAsync } = require('../share/helper');
 
 const PORT = 7781;
 const logPath = path.join(__dirname, '_server.log');

@@ -38,7 +38,12 @@ function logLineAsync(logMessage, logFilePath = logPath) {
  })
 }
 
+function checkForDuplicated(arrayOfObj) {
+
+}
+
 module.exports = {
   logLineSync,
   logLineAsync,
+  checkForDuplicated,
 };

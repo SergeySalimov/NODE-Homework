@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const fetch = require("isomorphic-fetch");
 const fs = require('fs');
-const { logLineAsync } = require('../share/loggers');
+const { logLineAsync, checkForDuplicated } = require('../share/helper');
 
 const webServer = express();
 const PORT = 7780;
