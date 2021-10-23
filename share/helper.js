@@ -38,12 +38,14 @@ function logLineAsync(logMessage, logFilePath = logPath) {
  })
 }
 
-function checkForDuplicated(arrayOfObj) {
-
+function removeDuplicated(arrayOfObj) {
+  const checkForDuplicate = [...arrayOfObj];
+  
+  return Array.from(new Set(checkForDuplicate.map(JSON.stringify))).map(JSON.parse);
 }
 
 module.exports = {
   logLineSync,
   logLineAsync,
-  checkForDuplicated,
+  removeDuplicated,
 };
