@@ -4,3 +4,4 @@ export enum RequestTypeEnum {
 }
 
 export const URL_REGEXP = 'https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)';
+// export const URL_REGEXP = '(?:^|\\s)((https?:\\/\\/)?(?:localhost|[\\w-]+(?:\\.[\\w-]+)+)(:\\d+)?(\\/\\S*)?)';

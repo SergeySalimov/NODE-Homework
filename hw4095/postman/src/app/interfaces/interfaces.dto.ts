@@ -16,3 +16,14 @@ export interface ResponseDto {
   headers: string[];
   responseText: string;
 }
+
+export interface History {
+  id: string;
+  type: RequestTypeEnum;
+  date: Date;
+}
+
+export type HistoryDto = Array<History>;
+// export interface HistoryDto {
+//   content: History[];
+// }

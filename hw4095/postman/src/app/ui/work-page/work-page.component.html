@@ -13,6 +13,8 @@
 
     <div *ngIf="showHistory" class="col-md-2">
       <h3 class="text-center saved-request h2">История</h3>
+
+      <div>{{postmanService.history$ | async | json}}</div>
     </div>
 
     <div [ngClass]="showHistory ? 'col-md-6' : 'col-md-8'">
