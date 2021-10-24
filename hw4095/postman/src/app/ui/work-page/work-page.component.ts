@@ -1,24 +1,27 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RequestForm } from '../../interfaces/interfaces.vm';
 import { PostmanService } from '../../services/postman.service';
-import { RequestDto, ResponseDto } from '../../interfaces/interfaces.dto';
+import { History, RequestDto, ResponseDto } from '../../interfaces/interfaces.dto';
 import { WorkPageHelper } from './work-page.helper';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-work-page',
   templateUrl: './work-page.component.html',
   styleUrls: ['./work-page.component.scss']
 })
-export class WorkPageComponent implements OnInit, OnDestroy {
-  showHistory = false;
+export class WorkPageComponent implements OnInit {
+  showHistory = true;
   disableSendRequest = true;
   request$: Observable<ResponseDto>;
-  historyData: BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  subscription: Subscription;
+  private _requestDataPatch: Subject<RequestForm> = new Subject<RequestForm>();
+  private _activeHistoryId: Subject<string> = new Subject<string>();
+  requestDataPatch$: Observable<RequestForm> = this._requestDataPatch.asObservable();
+  activeHistoryId$: Observable<string> = this._activeHistoryId.asObservable();
   
-  constructor(public postmanService: PostmanService) {}
+  constructor(public postmanService: PostmanService, public route: ActivatedRoute) {}
   
   ngOnInit(): void {
     this.postmanService.getHistory();
@@ -32,7 +35,14 @@ export class WorkPageComponent implements OnInit, OnDestroy {
     );
   }
   
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  deleteHistory(id: string) {
+    this.postmanService.deleteHistory(id).subscribe(() => {
+      this.postmanService.getHistory();
+    });
+  }
+  
+  applyHistory(history: History) {
+    this._activeHistoryId.next(history.id);
+    this._requestDataPatch.next(WorkPageHelper.translateHistoryToFormData(history));
   }
 }

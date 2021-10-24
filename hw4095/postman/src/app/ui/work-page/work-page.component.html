@@ -14,13 +14,22 @@
     <div *ngIf="showHistory" class="col-md-2">
       <h3 class="text-center saved-request h2">История</h3>
 
-      <div>{{postmanService.history$ | async | json}}</div>
+      <work-history-block
+        [histories]="postmanService.history$ | async"
+        [activeHistoryId]="activeHistoryId$ | async"
+        (deleteHistoryEmit)="deleteHistory($event)"
+        (applyHistoryEmit)="applyHistory($event)"
+      ></work-history-block>
     </div>
 
     <div [ngClass]="showHistory ? 'col-md-6' : 'col-md-8'">
       <h3 class="text-center requests h2">Запрос</h3>
 
-      <work-request-block #requestBlock (requestFormStatus)="disableSendRequest = $event"></work-request-block>
+      <work-request-block
+        #requestBlock
+        [pathFormValue]="requestDataPatch$ | async"
+        (requestFormStatus)="disableSendRequest = $event"
+      ></work-request-block>
     </div>
 
     <div class="col-md-4">

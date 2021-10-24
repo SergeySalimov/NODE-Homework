@@ -12,6 +12,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { WorkPageComponent } from './work-page/work-page.component';
 import { RequestBlockComponent } from './work-page/request-block/request-block.component';
 import { ResponseBlockComponent } from './work-page/response-block/response-block.component';
+import { HistoryBlockComponent } from './work-page/history-block/history-block.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { ResponseBlockComponent } from './work-page/response-block/response-bloc
     WorkPageComponent,
     RequestBlockComponent,
     ResponseBlockComponent,
+    HistoryBlockComponent,
   ],
   imports: [
     CommonModule,

@@ -44,8 +44,27 @@ function removeDuplicated(arrayOfObj) {
   return Array.from(new Set(checkForDuplicate.map(JSON.stringify))).map(JSON.parse);
 }
 
+function shuffleArray(array) {
+  const shuffledArray = [...array];
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+  
+  return shuffledArray;
+}
+
+function getNewId() {
+  // return 16 digit string ID
+  const randomString = (Date.now().toString(36)  + Math.random().toString(36).substring(2, 15));
+  const shuffledString = shuffleArray(randomString.split('')).join('');
+  
+  return shuffledString.substring(0, 16);
+}
+
 module.exports = {
   logLineSync,
   logLineAsync,
   removeDuplicated,
+  getNewId,
 };

@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const fetch = require("isomorphic-fetch");
 const fs = require('fs');
-const { logLineAsync, removeDuplicated } = require('../share/helper');
+const { logLineAsync, getNewId } = require('../share/helper');
 
 const webServer = express();
 const PORT = 7780;
@@ -21,9 +21,8 @@ webServer.use((req, res, next) => {
 });
 webServer.use(express.static(process.cwd() + pathToAppDist));
 
-
-webServer.get(`${API}/history`, (req, res) => {
-  res.setHeader('Cache-Control','public, max-age=0');
+webServer.get(`${API}/histories`, (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=0');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
@@ -34,19 +33,72 @@ webServer.get(`${API}/history`, (req, res) => {
     res.send(historyJson).end();
   } catch (e) {
     logLineAsync(`[${PORT}] history is not exist return null`, logPath);
-    res.send(null).end();
+    res.status(204).send([]).end();
   }
 });
 
-webServer.options(`${API}/request`, (req, res) => {
+webServer.get(`${API}/histories/:id`, (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=0');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Content-Type', 'application/json');
+  
+  const { id } = req.id;
+  
+  try {
+    const historyJson = fs.readFileSync(historyPath, 'utf-8');
+    const histories = JSON.parse(historyJson);
+    const response = histories.find(history => history.id === id);
+    
+    if (response) {
+      logLineAsync(`[${PORT}] history id=${id} was send`, logPath);
+      res.send(JSON.stringify(response)).end();
+    } else {
+      logLineAsync(`[${PORT}] history id=${id} was not found`, logPath);
+      res.status(404).end();
+    }
+  } catch (e) {
+    logLineAsync(`[${PORT}] history is not exist return null`, logPath);
+    res.status(204).send([]).end();
+  }
+});
+
+webServer.delete(`${API}/histories/:id`, (req, res) => {
+  const { id } = req.params;
+  let history;
+  try {
+    const historyJson = fs.readFileSync(historyPath, 'utf-8');
+    history = JSON.parse(historyJson);
+  } catch (e) {
+    res.status(422).end();
+  }
+  
+  const findIndex = history.findIndex(history => history.id === id);
+  if (findIndex === -1) {
+    res.status(404).end('History not found');
+  }
+  
+  history.splice(findIndex, 1);
+  try {
+    fs.writeFileSync(historyPath, JSON.stringify(history), 'utf-8');
+    logLineAsync(`[${PORT}] history file was successfully deleted`, logPath);
+  } catch (e) {
+    logLineAsync(`[${PORT}] error of deleting history`, logPath);
+    res.status(422).end();
+  }
+  
+  res.status(204).end();
+});
+
+webServer.options(`${API}/requests`, (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.send('');
 });
 
-webServer.post(`${API}/request`, async (req, res, next) => {
+webServer.post(`${API}/requests`, async (req, res, next) => {
   const { type, url, body, headers } = req.body;
-  newHistory = { ...req.body };
+  newHistory = { ...req.body, id: getNewId(), created: new Date() };
   
   const options = {
     method: type,
@@ -61,11 +113,11 @@ webServer.post(`${API}/request`, async (req, res, next) => {
     options.body = body;
   }
   
-  logLineAsync(`[${PORT}] proxy called for url=${url}, method ${type} ${!!headers ? 'with headers': ''} ${!!headers && !!options.body ? 'and' : ''} ${!!options.body ? 'with body': ''}`, logPath);
+  logLineAsync(`[${PORT}] proxy called for url=${url}, method ${type} ${!!headers ? 'with headers' : ''} ${!!headers && !!options.body ? 'and' : ''} ${!!options.body ? 'with body' : ''}`, logPath);
   
   let proxy_response;
   try {
-    proxy_response = await fetch( url, options);
+    proxy_response = await fetch(url, options);
   } catch (e) {
     logLineAsync(`[${PORT}] fetch request return error`, logPath);
     res.status(400).end();
@@ -73,7 +125,7 @@ webServer.post(`${API}/request`, async (req, res, next) => {
   
   const responseText = await proxy_response.text();
   
-  const headersArr =[];
+  const headersArr = [];
   proxy_response.headers.forEach((value, name) => {
     headersArr.push(`${name}: ${value}`);
   }, this);
@@ -89,14 +141,14 @@ webServer.post(`${API}/request`, async (req, res, next) => {
   
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Cache-Control','public, max-age=0');
+  res.setHeader('Cache-Control', 'public, max-age=0');
   res.setHeader('Content-Type', 'application/text');
   
   res.send(JSON.stringify(response));
   next();
 });
 
-webServer.use((req, res, next) => {
+webServer.use((req, res) => {
   let history;
   try {
     const historyJson = fs.readFileSync(historyPath, 'utf-8');
@@ -105,19 +157,14 @@ webServer.use((req, res, next) => {
     history = [];
   }
   
-  let isLengthChanged = history.length;
   history.push(newHistory);
-  history = removeDuplicated(history);
-  if (history.length === isLengthChanged) {
-    logLineAsync(`[${PORT}] history was duplicated and file was not updated`, logPath);
-  } else {
-    try {
-      fs.writeFileSync(historyPath, JSON.stringify(history), 'utf-8');
-      logLineAsync(`[${PORT}] history file was successfully updated`, logPath);
-    } catch (e) {
-      logLineAsync(`[${PORT}] error of saving history`, logPath);
-    }
+  try {
+    fs.writeFileSync(historyPath, JSON.stringify(history), 'utf-8');
+    logLineAsync(`[${PORT}] history file was successfully updated`, logPath);
+  } catch (e) {
+    logLineAsync(`[${PORT}] error of saving history`, logPath);
   }
+  
   res.end();
 });
 

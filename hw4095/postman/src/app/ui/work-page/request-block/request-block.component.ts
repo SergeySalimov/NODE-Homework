@@ -1,18 +1,20 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RequestTypeEnum, URL_REGEXP } from '../../../interfaces/constant';
+import { RequestForm } from '../../../interfaces/interfaces.vm';
 
 @Component({
   selector: 'work-request-block',
   templateUrl: './request-block.component.html',
   styleUrls: ['./request-block.component.scss']
 })
-export class RequestBlockComponent implements OnInit {
+export class RequestBlockComponent implements OnInit, OnChanges {
+  @Input() pathFormValue: RequestForm;
   @Output() requestFormStatus: EventEmitter<boolean> = new EventEmitter<boolean>();
   requestForm: FormGroup;
   type = RequestTypeEnum;
   
-  get headers(): FormArray {
+  get formHeaders(): FormArray {
     return this.requestForm.controls.headers as FormArray;
   }
   
@@ -23,22 +25,28 @@ export class RequestBlockComponent implements OnInit {
     this.initForm();
   }
   
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes.pathFormValue.firstChange
+      && changes.pathFormValue?.currentValue?.id !== changes.pathFormValue?.previousValue?.id) {
+      const { pathFormValue: { currentValue } } = changes;
+      this.initForm();
+      currentValue.headers.forEach(() => this.addHeader());
+      this.requestForm.patchValue(currentValue);
+      this.getIsInvalidOnChangeInForm();
+    }
+  }
+  
   initForm(): void {
     this.requestForm = this.fb.group({
       type: [RequestTypeEnum.GET],
       url: ['http://', [Validators.required, Validators.pattern(URL_REGEXP)]],
       body: [''],
-      headers: this.fb.array([
-        this.fb.group({
-          key: ['', Validators.required],
-          value: ['', Validators.required],
-        }),
-      ]),
+      headers: this.fb.array([]),
     });
   }
   
   addHeader(): void {
-    this.headers.push(
+    this.formHeaders.push(
       this.fb.group({
         key: ['', Validators.required],
         value: ['', Validators.required],
@@ -48,7 +56,7 @@ export class RequestBlockComponent implements OnInit {
   }
   
   removeHeader(i: number): void {
-    this.headers.removeAt(i);
+    this.formHeaders.removeAt(i);
     this.getIsInvalidOnChangeInForm();
   }
   

@@ -17,13 +17,9 @@ export interface ResponseDto {
   responseText: string;
 }
 
-export interface History {
+export interface History extends RequestDto {
   id: string;
-  type: RequestTypeEnum;
-  date: Date;
+  created: Date;
 }
 
 export type HistoryDto = Array<History>;
-// export interface HistoryDto {
-//   content: History[];
-// }

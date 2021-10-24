@@ -17,7 +17,7 @@
   <div formArrayName="headers" class="header-block material-block">
     <div class="material-title">Headers</div>
 
-    <ng-container *ngFor="let header of headers.controls; let i = index">
+    <ng-container *ngFor="let header of formHeaders.controls; let i = index">
       <div [formGroupName]="i" class="one-header-block">
         <mat-form-field appearance="outline" class="header-input">
           <mat-label>{{i + 1}}. Request header key</mat-label>
