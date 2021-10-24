@@ -1,7 +1,7 @@
 <div *ngFor="let history of histories"
      [class.alert-primary]="history.type === TYPE.GET"
      [class.alert-warning]="history.type === TYPE.POST"
-     [class.activeHistory]="history.id === activeHistoryId"
+     [class.active]="history.id === activeHistoryId"
      class="alert alert-dismissible alert-block p-2 m-1 history-block"
      role="alert"
      (click)="applyHistoryEmit.emit(history)"
@@ -16,7 +16,7 @@
     {{history.url}}
   </div>
   <button type="button" class="close" mat-icon-button>
-    <mat-icon class="small active" (click)="deleteHistoryEmit.emit(history.id)">delete</mat-icon>
-    <mat-icon class="small passive" (click)="deleteHistoryEmit.emit(history.id)">close</mat-icon>
+    <mat-icon class="small onHoverShow" (click)="deleteHistoryEmit.emit(history.id)">delete</mat-icon>
+    <mat-icon class="small standardShow" (click)="deleteHistoryEmit.emit(history.id)">close</mat-icon>
   </button>
 </div>

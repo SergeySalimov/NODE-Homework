@@ -1,5 +1,5 @@
 :host {
-  .activeHistory {
+  .active {
     outline: 2px solid var(--main-base);
   }
 
@@ -18,7 +18,7 @@
     right: -11px;
     padding: 0;
 
-    &:hover .passive, &:not(:hover) .active {
+    &:hover .standardShow, &:not(:hover) .onHoverShow {
       display: none;
     }
 
