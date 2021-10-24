@@ -27,7 +27,7 @@
 
       <work-request-block
         #requestBlock
-        [pathFormValue]="requestDataPatch$ | async"
+        [pathFormValue]="requestFormPatch$ | async"
         (requestFormStatus)="disableSendRequest = $event"
       ></work-request-block>
     </div>
@@ -35,7 +35,7 @@
     <div class="col-md-4">
       <h3 class="text-center responses h2">Ответ</h3>
 
-      <work-response-block [response]="request$ | async"></work-response-block>
+      <work-response-block [response]="postmanService.response$ | async"></work-response-block>
     </div>
   </div>
 </div>

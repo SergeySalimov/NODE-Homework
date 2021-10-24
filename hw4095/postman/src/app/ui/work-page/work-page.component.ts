@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestForm } from '../../interfaces/interfaces.vm';
 import { PostmanService } from '../../services/postman.service';
-import { History, RequestDto, ResponseDto } from '../../interfaces/interfaces.dto';
+import { History, RequestDto } from '../../interfaces/interfaces.dto';
 import { WorkPageHelper } from './work-page.helper';
 import { Observable, Subject } from 'rxjs';
-import { finalize } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -15,10 +14,9 @@ import { ActivatedRoute } from '@angular/router';
 export class WorkPageComponent implements OnInit {
   showHistory = true;
   disableSendRequest = true;
-  request$: Observable<ResponseDto>;
-  private _requestDataPatch: Subject<RequestForm> = new Subject<RequestForm>();
+  private _requestFormPatch: Subject<RequestForm> = new Subject<RequestForm>();
   private _activeHistoryId: Subject<string> = new Subject<string>();
-  requestDataPatch$: Observable<RequestForm> = this._requestDataPatch.asObservable();
+  requestFormPatch$: Observable<RequestForm> = this._requestFormPatch.asObservable();
   activeHistoryId$: Observable<string> = this._activeHistoryId.asObservable();
   
   constructor(public postmanService: PostmanService, public route: ActivatedRoute) {}
@@ -30,11 +28,10 @@ export class WorkPageComponent implements OnInit {
   sendRequest(data: RequestForm) {
     const req: RequestDto = WorkPageHelper.translateFormDataToRequestDto(data);
     
-    this.request$ = this.postmanService.sendRequest(req).pipe(
-      finalize(() => this.postmanService.getHistory()),
-    );
+    this.postmanService.sendRequest(req);
   }
   
+  //Todo move this logik to service
   deleteHistory(id: string) {
     this.postmanService.deleteHistory(id).subscribe(() => {
       this.postmanService.getHistory();
@@ -43,6 +40,6 @@ export class WorkPageComponent implements OnInit {
   
   applyHistory(history: History) {
     this._activeHistoryId.next(history.id);
-    this._requestDataPatch.next(WorkPageHelper.translateHistoryToFormData(history));
+    this._requestFormPatch.next(WorkPageHelper.translateHistoryToFormData(history));
   }
 }

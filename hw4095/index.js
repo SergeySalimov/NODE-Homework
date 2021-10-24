@@ -96,7 +96,7 @@ webServer.options(`${API}/requests`, (req, res) => {
   res.send('');
 });
 
-webServer.post(`${API}/requests`, async (req, res, next) => {
+webServer.post(`${API}/requests`, async (req, res) => {
   const { type, url, body, headers } = req.body;
   newHistory = { ...req.body, id: getNewId(), created: new Date() };
   
@@ -145,10 +145,7 @@ webServer.post(`${API}/requests`, async (req, res, next) => {
   res.setHeader('Content-Type', 'application/text');
   
   res.send(JSON.stringify(response));
-  next();
-});
-
-webServer.use((req, res) => {
+  
   let history;
   try {
     const historyJson = fs.readFileSync(historyPath, 'utf-8');
