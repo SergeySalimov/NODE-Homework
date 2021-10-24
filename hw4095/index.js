@@ -11,7 +11,6 @@ const API = '/api';
 const pathToAppDist = '/postman/dist/postman/';
 const logPath = path.join(__dirname, '_server.log');
 const historyPath = path.join(__dirname, 'data/history.json');
-let newHistory = {};
 
 webServer.use(express.urlencoded({ extended: true }));
 webServer.use(express.json({ extended: true }));
@@ -98,7 +97,7 @@ webServer.options(`${API}/requests`, (req, res) => {
 
 webServer.post(`${API}/requests`, async (req, res) => {
   const { type, url, body, headers } = req.body;
-  newHistory = { ...req.body, id: getNewId(), created: new Date() };
+  const newHistory = { ...req.body, id: getNewId(), created: new Date() };
   
   const options = {
     method: type,
