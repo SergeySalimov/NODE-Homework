@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { VotesService } from '../../services/votes.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { StatisticVM } from '../../interfaces/interfaces.vm';
 import { AnswerStatisticDto, StatisticViewDto } from '../../interfaces/interfaces.dto';
 import { map } from 'rxjs/operators';
@@ -12,7 +12,9 @@ import { map } from 'rxjs/operators';
 })
 export class StatisticPageComponent {
   statistics$: Observable<StatisticVM> = this.voteService.getStatistic();
-  showTextArea = false;
+  statisticsTxt$: Observable<StatisticVM> = this.voteService.getStatisticTxt();
+  showJsonTextArea = false;
+  showTxtTextArea = false;
   
   questionsFromStatistic$: Observable<StatisticViewDto[]> = this.statistics$.pipe(
     map(stat => this.parseStatistic(stat)),

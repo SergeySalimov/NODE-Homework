@@ -32,13 +32,24 @@ webServer.get('/api/stat', (req, res) => {
   res.setHeader('Cache-Control','public, max-age=0');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Content-Type', 'application/json');
+  
+  const acceptHeader = req.headers['accept'];
+  
+  if (acceptHeader === 'text/plain') {
+    res.setHeader('Content-Type', 'text/plain');
+  } else {
+    res.setHeader('Content-Type', 'application/json');
+  }
   
   try {
     const statisticJson = fs.readFileSync(statisticPath, 'utf-8');
     logLineAsync(`[${PORT}] statistic was send`, logPath);
     
-    res.send(statisticJson);
+    if (acceptHeader === 'text/plain') {
+      res.send(JSON.stringify(statisticJson));
+    } else {
+      res.send(statisticJson);
+    }
   } catch (e) {
     logLineAsync(`[${PORT}] statistic was send from ZERO file`, logPath);
     

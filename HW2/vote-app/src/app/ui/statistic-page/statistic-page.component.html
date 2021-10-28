@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <h2 class="text-center my-4">Статистика ответов</h2>
 
-    <div class="col-4" *ngFor="let question of questionsFromStatistic$ | async">
+    <div class="col-sm-4" *ngFor="let question of questionsFromStatistic$ | async">
       <h4 class="text-center">Вопрос про:</h4>
       <h5 class="mb-3">{{question.questionName | slice:0:60 }}...</h5>
       <h6 class="my-3">Статистика ответов:</h6>
@@ -13,14 +13,27 @@
       </ul>
     </div>
 
-    <div class="show-statistic-file col-9 mt-4 mb-2">
-      <button mat-stroked-button color="primary" (click)="showTextArea = !showTextArea">
-        {{showTextArea ? 'Hide' : 'Show'}} statistic in Json format
+
+    <div class="col-md-12 my-2 show-statistic-file">
+      <button mat-stroked-button color="primary" (click)="showJsonTextArea = !showJsonTextArea; showTxtTextArea = false">
+        {{showJsonTextArea ? 'Hide' : 'Show'}} statistic in Json format
       </button>
 
-      <textarea *ngIf="showTextArea" class="statistic-file my-4">
+      <button mat-stroked-button color="primary" (click)="showTxtTextArea = !showTxtTextArea; showJsonTextArea = false">
+        {{showTxtTextArea ? 'Hide' : 'Show'}} statistic in Text format
+      </button>
+    </div>
+
+    <div class="offset-md-2 col-md-8 mb-4">
+      <textarea *ngIf="showJsonTextArea" class="statistic-file my-4">
         {{statistics$ | async | json}}
       </textarea>
+    </div>
+
+    <div class="offset-md-2 col-md-8 mt-1 mb-4">
+        <textarea *ngIf="showTxtTextArea" class="statistic-file my-4">
+          {{statisticsTxt$ | async}}
+        </textarea>
     </div>
 
   </div>

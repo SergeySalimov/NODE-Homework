@@ -25,7 +25,23 @@ export class VotesService {
   getStatistic(): Observable<StatisticVM> {
     this.$isLoaded.next(true);
     
-    return this.http.get<StatisticVM>(`${this.rootURL}/stat`).pipe(
+    return this.http.get<StatisticVM>(`${this.rootURL}/stat`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    }).pipe(
+      finalize(() => this.$isLoaded.next(false)),
+    );
+  }
+  
+  getStatisticTxt(): Observable<any> {
+    this.$isLoaded.next(true);
+    
+    return this.http.get<StatisticVM>(`${this.rootURL}/stat`, {
+      headers: {
+        'Accept': 'text/plain',
+      },
+    }).pipe(
       finalize(() => this.$isLoaded.next(false)),
     );
   }
