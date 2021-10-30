@@ -35,22 +35,17 @@ webServer.get('/api/stat', (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   
   const acceptHeader = req.headers['accept'];
+  const isAcceptHeaderTextPlain = (acceptHeader === 'text/plain');
   
-  if (acceptHeader === 'text/plain') {
-    res.setHeader('Content-Type', 'text/plain');
-  } else {
-    res.setHeader('Content-Type', 'application/json');
-  }
+  isAcceptHeaderTextPlain
+    ? res.setHeader('Content-Type', 'text/plain')
+    : res.setHeader('Content-Type', 'application/json');
   
   try {
     const statisticJson = fs.readFileSync(statisticPath, 'utf-8');
     logLineAsync(`[${PORT}] statistic was send`, logPath);
-    
-    if (acceptHeader === 'text/plain') {
-      res.send(JSON.stringify(statisticJson));
-    } else {
-      res.send(statisticJson);
-    }
+  
+    isAcceptHeaderTextPlain ? res.send(JSON.stringify(statisticJson)) : res.send(statisticJson);
   } catch (e) {
     logLineAsync(`[${PORT}] statistic was send from ZERO file`, logPath);
     
