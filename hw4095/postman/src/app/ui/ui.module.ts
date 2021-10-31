@@ -13,6 +13,7 @@ import { WorkPageComponent } from './work-page/work-page.component';
 import { RequestBlockComponent } from './work-page/request-block/request-block.component';
 import { ResponseBlockComponent } from './work-page/response-block/response-block.component';
 import { HistoryBlockComponent } from './work-page/history-block/history-block.component';
+import { ButtonLineBlockComponent } from './work-page/button-line-block/button-line-block.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { HistoryBlockComponent } from './work-page/history-block/history-block.c
     RequestBlockComponent,
     ResponseBlockComponent,
     HistoryBlockComponent,
+    ButtonLineBlockComponent,
   ],
   imports: [
     CommonModule,

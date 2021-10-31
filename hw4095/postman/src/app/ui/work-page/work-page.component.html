@@ -2,14 +2,12 @@
   <div class="row">
     <h2 class="text-center mt-4 mb-2 h1">Сделайте запрос</h2>
 
-    <div class="button-line mb-3">
-      <mat-slide-toggle [checked]="showHistory" (change)="showHistory = !showHistory">История</mat-slide-toggle>
-
-      <button mat-raised-button color="primary"
-              (click)="sendRequest(requestBlock.requestForm.getRawValue())"
-              [disabled]="disableSendRequest"
-      >Выслать запрос</button>
-    </div>
+    <work-button-line-block
+      [showHistory]="showHistory"
+      [disableSendRequest]="disableSendRequest"
+      (onSendRequest)="sendRequest(requestBlock.requestForm.getRawValue())"
+      (onChangeHistory)="showHistory = !$event"
+    ></work-button-line-block>
 
     <div *ngIf="showHistory" class="col-md-2">
       <h3 class="text-center saved-request h2">История</h3>

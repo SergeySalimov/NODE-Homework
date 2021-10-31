@@ -1,0 +1,8 @@
+<div class="button-line mb-3">
+  <mat-slide-toggle [checked]="showHistory" (change)="onChangeHistory.emit(showHistory)">История</mat-slide-toggle>
+
+  <button mat-raised-button color="primary"
+          (click)="onSendRequest.emit()"
+          [disabled]="disableSendRequest"
+  >Выслать запрос</button>
+</div>
