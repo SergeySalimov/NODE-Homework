@@ -12,6 +12,9 @@ const routes: Routes = [
     path: 'home', component: HomePageComponent,
   },
   {
+    path: 'work/:id', component: WorkPageComponent,
+  },
+  {
     path: 'work', component: WorkPageComponent,
   },
   {

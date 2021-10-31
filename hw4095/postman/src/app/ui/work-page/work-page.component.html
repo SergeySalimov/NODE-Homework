@@ -3,24 +3,24 @@
     <h2 class="text-center mt-4 mb-2 h1">Сделайте запрос</h2>
 
     <work-button-line-block
-      [showHistory]="showHistory"
+      [showHistory]="showHistory$ | async"
       [disableSendRequest]="disableSendRequest"
       (onSendRequest)="sendRequest(requestBlock.requestForm.getRawValue())"
-      (onChangeHistory)="showHistory = !$event"
+      (onChangeHistory)="onHideShowHistory($event)"
     ></work-button-line-block>
 
-    <div *ngIf="showHistory" class="col-md-2">
+    <div *ngIf="showHistory$ | async" class="col-md-2">
       <h3 class="text-center saved-request h2">История</h3>
 
       <work-history-block
         [histories]="postmanService.history$ | async"
         [activeHistoryId]="activeHistoryId$ | async"
-        (deleteHistoryEmit)="deleteHistory($event)"
-        (applyHistoryEmit)="applyHistory($event)"
+        (deleteHistoryEmit)="onDeleteHistory($event)"
+        (changeHistoryEmit)="onChangeHistory($event)"
       ></work-history-block>
     </div>
 
-    <div [ngClass]="showHistory ? 'col-md-6' : 'col-md-8'">
+    <div [ngClass]="(showHistory$ | async) ? 'col-md-6' : 'col-md-8'">
       <h3 class="text-center requests h2">Запрос</h3>
 
       <work-request-block

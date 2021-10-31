@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { History, HistoryDto } from '../../../interfaces/interfaces.dto';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { HistoryDto } from '../../../interfaces/interfaces.dto';
 import { RequestTypeEnum } from '../../../interfaces/constant';
 
 @Component({
@@ -7,15 +7,10 @@ import { RequestTypeEnum } from '../../../interfaces/constant';
   templateUrl: './history-block.component.html',
   styleUrls: ['./history-block.component.scss']
 })
-export class HistoryBlockComponent implements OnInit {
+export class HistoryBlockComponent {
   @Input() histories: HistoryDto;
   @Input() activeHistoryId: string;
   @Output() deleteHistoryEmit: EventEmitter<string> = new EventEmitter<string>();
-  @Output() applyHistoryEmit: EventEmitter<History> = new EventEmitter<History>();
+  @Output() changeHistoryEmit: EventEmitter<string> = new EventEmitter<string>();
   TYPE = RequestTypeEnum;
-  
-  constructor() { }
-
-  ngOnInit(): void {
-  }
 }

@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { RequestForm } from '../../interfaces/interfaces.vm';
 import { PostmanService } from '../../services/postman.service';
-import { History, RequestDto } from '../../interfaces/interfaces.dto';
+import { History, HistoryDto, RequestDto } from '../../interfaces/interfaces.dto';
 import { WorkPageHelper } from './work-page.helper';
-import { Observable, Subject } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { distinctUntilChanged, filter, map, pluck } from 'rxjs/operators';
 
 @Component({
   selector: 'app-work-page',
@@ -13,33 +14,49 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class WorkPageComponent implements OnInit {
   showHistory = true;
+  showHistory$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   disableSendRequest = true;
-  private _requestFormPatch: Subject<RequestForm> = new Subject<RequestForm>();
-  private _activeHistoryId: Subject<string> = new Subject<string>();
-  requestFormPatch$: Observable<RequestForm> = this._requestFormPatch.asObservable();
-  activeHistoryId$: Observable<string> = this._activeHistoryId.asObservable();
+  activeHistoryId$: Observable<string> = this.route.params.pipe(
+    pluck('id'),
+    distinctUntilChanged(),
+  );
+  requestFormPatch$: Observable<RequestForm> = combineLatest([
+    this.postmanService.history$,
+    this.activeHistoryId$,
+  ]).pipe(
+    map(([histories, activeHistoryId]: [HistoryDto, string]) => histories.find(history => history.id === activeHistoryId)),
+    filter(Boolean),
+    map(activeHistory => WorkPageHelper.translateHistoryToFormData(activeHistory as History)),
+  );
   
-  constructor(public postmanService: PostmanService, public route: ActivatedRoute) {}
+  constructor(
+    public postmanService: PostmanService,
+    public route: ActivatedRoute,
+    public router: Router,
+  ) {}
   
   ngOnInit(): void {
     this.postmanService.getHistory();
   }
   
-  sendRequest(data: RequestForm) {
+  sendRequest(data: RequestForm): void {
     const req: RequestDto = WorkPageHelper.translateFormDataToRequestDto(data);
     
     this.postmanService.sendRequest(req);
   }
   
-  //Todo move this logik to service
-  deleteHistory(id: string) {
+  onDeleteHistory(id: string): void {
     this.postmanService.deleteHistory(id).subscribe(() => {
+      this.router.navigate(['/work']);
       this.postmanService.getHistory();
     });
   }
   
-  applyHistory(history: History) {
-    this._activeHistoryId.next(history.id);
-    this._requestFormPatch.next(WorkPageHelper.translateHistoryToFormData(history));
+  onChangeHistory(id: string): void {
+    console.log(id);
+  }
+  
+  onHideShowHistory(showHistoryCurrent: boolean): void {
+  
   }
 }
