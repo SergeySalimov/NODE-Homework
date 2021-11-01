@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'work-button-line-block',
+  selector: 'app-work-button-line-block',
   templateUrl: './button-line-block.component.html',
   styleUrls: ['./button-line-block.component.scss']
 })
 export class ButtonLineBlockComponent {
   @Input() showHistory: boolean;
   @Input() disableSendRequest: boolean;
-  @Output() onSendRequest: EventEmitter<void> = new EventEmitter<void>();
-  @Output() onChangeHistory: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() sendRequestEmit: EventEmitter<void> = new EventEmitter<void>();
+  @Output() changeHistoryEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 }

@@ -2,38 +2,38 @@
   <div class="row">
     <h2 class="text-center mt-4 mb-2 h1">Сделайте запрос</h2>
 
-    <work-button-line-block
+    <app-work-button-line-block
       [showHistory]="showHistory$ | async"
       [disableSendRequest]="disableSendRequest"
-      (onSendRequest)="sendRequest(requestBlock.requestForm.getRawValue())"
-      (onChangeHistory)="onHideShowHistory($event)"
-    ></work-button-line-block>
+      (sendRequestEmit)="sendRequest(requestBlock.requestForm.getRawValue())"
+      (changeHistoryEmit)="onHideShowHistory($event)"
+    ></app-work-button-line-block>
 
     <div *ngIf="showHistory$ | async" class="col-md-2">
       <h3 class="text-center saved-request h2">История</h3>
 
-      <work-history-block
+      <app-work-history-block
         [histories]="postmanService.history$ | async"
         [activeHistoryId]="activeHistoryId$ | async"
         (deleteHistoryEmit)="onDeleteHistory($event)"
         (changeHistoryEmit)="onChangeHistory($event)"
-      ></work-history-block>
+      ></app-work-history-block>
     </div>
 
     <div [ngClass]="(showHistory$ | async) ? 'col-md-6' : 'col-md-8'">
       <h3 class="text-center requests h2">Запрос</h3>
 
-      <work-request-block
+      <app-work-request-block
         #requestBlock
         [pathFormValue]="requestFormPatch$ | async"
         (requestFormStatus)="disableSendRequest = $event"
-      ></work-request-block>
+      ></app-work-request-block>
     </div>
 
     <div class="col-md-4">
       <h3 class="text-center responses h2">Ответ</h3>
 
-      <work-response-block [response]="postmanService.response$ | async"></work-response-block>
+      <app-work-response-block [response]="postmanService.response$ | async"></app-work-response-block>
     </div>
   </div>
 </div>

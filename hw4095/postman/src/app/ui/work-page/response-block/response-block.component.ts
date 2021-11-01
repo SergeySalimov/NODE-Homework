@@ -2,16 +2,16 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ResponseDto } from '../../../interfaces/interfaces.dto';
 
 @Component({
-  selector: 'work-response-block',
+  selector: 'app-work-response-block',
   templateUrl: './response-block.component.html',
   styleUrls: ['./response-block.component.scss']
 })
 export class ResponseBlockComponent implements OnInit {
   @Input() response!: ResponseDto;
-  
+
   get color(): string {
     const responseFirstNumber = +String(this.response?.status)[0];
-    
+
     switch (responseFirstNumber) {
       case 1:
         return 'gray';
@@ -26,15 +26,15 @@ export class ResponseBlockComponent implements OnInit {
         return 'black';
     }
   }
-  
+
   get responseText(): string[] {
     return this.response?.responseText.split('\n') || [];
   }
-  
+
   constructor() {
   }
-  
+
   ngOnInit(): void {
   }
-  
+
 }

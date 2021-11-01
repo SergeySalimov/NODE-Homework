@@ -3,7 +3,7 @@ import { HistoryDto } from '../../../interfaces/interfaces.dto';
 import { RequestTypeEnum } from '../../../interfaces/constant';
 
 @Component({
-  selector: 'work-history-block',
+  selector: 'app-work-history-block',
   templateUrl: './history-block.component.html',
   styleUrls: ['./history-block.component.scss']
 })

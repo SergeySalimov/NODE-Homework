@@ -3,19 +3,20 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomePageComponent } from './ui/home-page/home-page.component';
 import { NotFoundPageComponent } from './ui/not-found-page/not-found-page.component';
 import { WorkPageComponent } from './ui/work-page/work-page.component';
+import { RouteEnum } from './app-routing.constant';
 
 const routes: Routes = [
   {
-    path: '', redirectTo: 'work', pathMatch: 'full',
+    path: '', redirectTo: RouteEnum.WORK, pathMatch: 'full',
   },
   {
-    path: 'home', component: HomePageComponent,
+    path: RouteEnum.HOME, component: HomePageComponent,
   },
   {
-    path: 'work/:id', component: WorkPageComponent,
+    path: `${RouteEnum.WORK}/:id`, component: WorkPageComponent,
   },
   {
-    path: 'work', component: WorkPageComponent,
+    path: RouteEnum.WORK, component: WorkPageComponent,
   },
   {
     path: '**', component: NotFoundPageComponent,

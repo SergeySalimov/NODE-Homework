@@ -1,12 +1,12 @@
 <div class="button-line mb-3">
-  <mat-slide-toggle [checked]="showHistory" (change)="onChangeHistory.emit(showHistory)">История</mat-slide-toggle>
+  <mat-slide-toggle [checked]="showHistory" (change)="changeHistoryEmit.emit(showHistory)">История</mat-slide-toggle>
 
   <button mat-raised-button color="accent"
           routerLink="/work"
   >Новый запрос</button>
 
   <button mat-raised-button color="primary"
-          (click)="onSendRequest.emit()"
+          (click)="sendRequestEmit.emit()"
           [disabled]="disableSendRequest"
   >Выслать запрос</button>
 </div>

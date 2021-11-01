@@ -1,10 +1,10 @@
 <div *ngFor="let history of histories"
      [class.alert-primary]="history.type === TYPE.GET"
      [class.alert-warning]="history.type === TYPE.POST"
+     [class.active-history]="history.id === activeHistoryId"
      class="alert alert-dismissible alert-block p-2 m-1 history-block"
      role="alert"
      (click)="changeHistoryEmit.emit(history.id)"
-     routerLinkActive="active-history"
 >
   <div class="first-line">
     <span><strong>{{history.type}}</strong></span>

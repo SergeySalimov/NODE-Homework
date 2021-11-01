@@ -8,19 +8,19 @@ export class WorkPageHelper {
     headersForm.length === 0
       ? headers = null
       : headersForm.forEach((header: KeyValueInterface) => headers[header.key] = header.value);
-    
+
     return {type, url, body, headers};
   }
-  
+
   static translateHistoryToFormData(data: History): RequestForm {
     const headers = [];
-    
+
     if (data.headers) {
-      for(const [key, value] of Object.entries(data.headers)) {
+      for (const [key, value] of Object.entries(data.headers)) {
         headers.push({ key, value });
       }
     }
-    
+
     return {
       headers,
       type: data.type,
