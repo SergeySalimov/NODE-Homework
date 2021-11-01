@@ -2,31 +2,36 @@
   <div class="row">
     <h2 class="text-center mt-4 mb-2 h1">Сделайте запрос</h2>
 
-    <app-work-button-line-block
-      [showHistory]="showHistory$ | async"
-      [disableSendRequest]="disableSendRequest"
-      (sendRequestEmit)="sendRequest(requestBlock.requestForm.getRawValue())"
-      (changeHistoryEmit)="onHideShowHistory($event)"
-    ></app-work-button-line-block>
+    <div class="button-line mb-3">
+      <mat-slide-toggle [checked]="showHistory" (change)="showHistory = !showHistory">История</mat-slide-toggle>
 
-    <div *ngIf="showHistory$ | async" class="col-md-2">
+      <button mat-raised-button color="accent" [routerLink]="['/', ROUTES.WORK]">Новый запрос</button>
+
+      <button mat-raised-button color="primary"
+              (click)="sendRequest(requestBlockComponent.requestForm.getRawValue())"
+              [disabled]="disableSendRequest$ | async">
+        Выслать запрос
+      </button>
+    </div>
+
+    <div *ngIf="showHistory" class="col-md-2">
       <h3 class="text-center saved-request h2">История</h3>
 
       <app-work-history-block
         [histories]="postmanService.history$ | async"
         [activeHistoryId]="activeHistoryId$ | async"
         (deleteHistoryEmit)="onDeleteHistory($event)"
-        (changeHistoryEmit)="onChangeHistory($event)"
+        (changeHistoryEmit)="navigateOnHistory($event)"
       ></app-work-history-block>
     </div>
 
-    <div [ngClass]="(showHistory$ | async) ? 'col-md-6' : 'col-md-8'">
+    <div [ngClass]="showHistory ? 'col-md-6' : 'col-md-8'">
       <h3 class="text-center requests h2">Запрос</h3>
 
       <app-work-request-block
-        #requestBlock
+        #requestBlockComponent
         [pathFormValue]="requestFormPatch$ | async"
-        (requestFormStatus)="disableSendRequest = $event"
+        (requestFormStatus)="onRequestFormStatusChange($event)"
       ></app-work-request-block>
     </div>
 

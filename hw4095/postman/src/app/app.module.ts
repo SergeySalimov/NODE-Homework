@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UIModule } from './ui/ui.module';
 import { HttpClientModule } from '@angular/common/http';
 import { PostmanService } from './services/postman.service';
+import { UiStateService } from './services/ui-state.service';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,7 @@ import { PostmanService } from './services/postman.service';
     AppRoutingModule,
     UIModule,
   ],
-  providers: [PostmanService],
+  providers: [PostmanService, UiStateService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

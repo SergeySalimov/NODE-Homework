@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RequestForm } from '../../interfaces/interfaces.vm';
 import { PostmanService } from '../../services/postman.service';
 import { History, HistoryDto, RequestDto } from '../../interfaces/interfaces.dto';
@@ -14,8 +14,10 @@ import { RouteEnum } from '../../app-routing.constant';
   styleUrls: ['./work-page.component.scss']
 })
 export class WorkPageComponent implements OnInit {
+  showHistory = true;
+  ROUTES = RouteEnum;
   showHistory$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  disableSendRequest = true;
+  disableSendRequest$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   activeHistoryId$: Observable<string> = this.route.params.pipe(
     pluck('id'),
     distinctUntilChanged(),
@@ -29,11 +31,14 @@ export class WorkPageComponent implements OnInit {
     map(activeHistory => WorkPageHelper.translateHistoryToFormData(activeHistory as History)),
   );
 
+  @ViewChild('requestBlockComponent', { static: true }) requestBlock: any;
+
   constructor(
     public postmanService: PostmanService,
     public route: ActivatedRoute,
     public router: Router,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.postmanService.getHistory();
@@ -47,20 +52,23 @@ export class WorkPageComponent implements OnInit {
 
   onDeleteHistory(id: string): void {
     this.postmanService.deleteHistory(id).subscribe(() => {
-      this.router.navigate(['/', RouteEnum.WORK]);
+      this.router.navigateByUrl('/' + RouteEnum.WORK);
       this.postmanService.getHistory();
     });
   }
 
   navigateOnHistory(id: string): void {
-    setTimeout(() => this.router.navigate(['/', RouteEnum.WORK, id]));
+    this.router.navigateByUrl(`/${RouteEnum.WORK}/${id}`).then(() => {
+      this.requestBlock.getIsInvalidOnChangeInForm();
+    });
   }
 
-  onChangeHistory(id: string): void {
-    this.navigateOnHistory(id);
+  onHideShowHistory(): void {
+    const currentState = this.showHistory$.getValue();
+    this.showHistory$.next(!currentState);
   }
 
-  onHideShowHistory(showHistoryCurrent: boolean): void {
-    console.log(showHistoryCurrent);
+  onRequestFormStatusChange(status: boolean): void {
+    setTimeout(() => this.disableSendRequest$.next(status));
   }
 }

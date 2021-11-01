@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RequestTypeEnum, URL_REGEXP } from '../../../interfaces/constant';
 import { RequestForm } from '../../../interfaces/interfaces.vm';
+import { UiStateService } from '../../../services/ui-state.service';
 
 @Component({
   selector: 'app-work-request-block',
@@ -26,8 +27,7 @@ export class RequestBlockComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes.pathFormValue.firstChange
-      && changes.pathFormValue?.currentValue?.id !== changes.pathFormValue?.previousValue?.id) {
+    if (!changes.pathFormValue.firstChange) {
       const {pathFormValue: {currentValue}} = changes;
       this.initForm();
       currentValue.headers.forEach(() => this.addHeader());
@@ -61,6 +61,6 @@ export class RequestBlockComponent implements OnInit, OnChanges {
   }
 
   getIsInvalidOnChangeInForm(): void {
-    this.requestFormStatus.emit(this.requestForm.invalid);
+    this.requestFormStatus.next(this.requestForm.invalid);
   }
 }
