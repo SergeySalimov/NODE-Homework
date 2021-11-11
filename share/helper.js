@@ -1,6 +1,7 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import assert from 'assert';
 
 const logPath = path.join(__dirname, '_server.log');
 
@@ -62,9 +63,24 @@ function getNewId() {
   return shuffledString.substring(0, 16);
 }
 
-module.exports = {
+function checkIdValidity(id, logPath, PORT) {
+  try {
+    // Check for correct id
+    assert(typeof id === 'string');
+    assert(!id.match(/\s|S+/));
+    assert(id.length === 16);
+  } catch (e) {
+    logLineAsync(`[${PORT}] history id=${id} was incorrect`, logPath);
+    return false;
+  }
+  
+  return true;
+}
+
+export {
   logLineSync,
   logLineAsync,
   removeDuplicated,
   getNewId,
+  checkIdValidity,
 };
