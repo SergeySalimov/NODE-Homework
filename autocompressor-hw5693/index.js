@@ -17,7 +17,6 @@ let workingFolder;
 if (process.argv.length <= 2) {
   workingFolder = path.join(__dirname, defaultFolderName);
 } else {
-  process.exit;
   workingFolder = path.join(__dirname, process.argv[2]);
 }
 
