@@ -39,7 +39,7 @@ async function getFilesFromFolder(folder) {
   try {
     return await readdir(folder);
   } catch (e) {
-    messageLog('Error no such directory! Program was terminated');
+    messageLog(`${folder} Error no such directory! Program was terminated`);
   }
 }
 
