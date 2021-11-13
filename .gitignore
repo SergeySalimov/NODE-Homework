@@ -10,3 +10,4 @@ nginx_caches/
 **/dist
 /hw3095/results.json
 /hw4095/data/history.json
+/autocompressor-hw5693/gzip-place/

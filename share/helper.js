@@ -76,10 +76,23 @@ function checkIdValidity(id, logPath, PORT) {
   return true;
 }
 
+function getDateTimeLog() {
+  const logDT = new Date();
+  const currentDateTime = `${logDT.toLocaleDateString()} ${logDT.toLocaleTimeString()}:>`;
+  
+  return currentDateTime;
+}
+
+function messageLog(msg) {
+  return console.log(`${getDateTimeLog()} ${msg}`);
+}
+
 module.exports = {
   logLineSync,
   logLineAsync,
   removeDuplicated,
   getNewId,
   checkIdValidity,
+  getDateTimeLog,
+  messageLog,
 };
