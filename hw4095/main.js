@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import fetch from 'isomorphic-fetch';
 import fs from 'fs';
-import { logLineAsync, getNewId, checkIdValidity } from '../share/helper';
+import { logLineAsync, getNewId, checkIdValidity } from '../share/helper-es6';
 
 const webServer = express();
 const PORT = 7780;

@@ -1,6 +1,7 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import assert from 'assert';
 
 const logPath = path.join(__dirname, '_server.log');
 
@@ -16,26 +17,26 @@ function logLineSync(logMessage, logFilePath = logPath) {
 }
 
 function logLineAsync(logMessage, logFilePath = logPath) {
- return new Promise((resolve ,reject) => {
-   const logDT = new Date();
-   const fullLog = `${logDT.toLocaleDateString()} ${logDT.toLocaleTimeString()} ${logMessage}`;
-  
-   console.log(fullLog);
-  
-   fs.open(logFilePath, 'a+', (err, logFd) => {
-     if(err) {
-       reject(err);
-     } else {
-       fs.write(logFd, fullLog + os.EOL, (err) => {
-         if (err) {
-           reject(err);
-         } else {
-           fs.close(logFd, err => { err ? reject(err) : resolve(); });
-         }
-       });
-     }
-   });
- })
+  return new Promise((resolve ,reject) => {
+    const logDT = new Date();
+    const fullLog = `${logDT.toLocaleDateString()} ${logDT.toLocaleTimeString()} ${logMessage}`;
+    
+    console.log(fullLog);
+    
+    fs.open(logFilePath, 'a+', (err, logFd) => {
+      if(err) {
+        reject(err);
+      } else {
+        fs.write(logFd, fullLog + os.EOL, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            fs.close(logFd, err => { err ? reject(err) : resolve(); });
+          }
+        });
+      }
+    });
+  })
 }
 
 function removeDuplicated(arrayOfObj) {
@@ -76,7 +77,7 @@ function checkIdValidity(id, logPath, PORT) {
   return true;
 }
 
-module.exports = {
+export {
   logLineSync,
   logLineAsync,
   removeDuplicated,
