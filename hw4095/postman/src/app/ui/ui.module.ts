@@ -14,6 +14,7 @@ import { RequestBlockComponent } from './work-page/request-block/request-block.c
 import { ResponseBlockComponent } from './work-page/response-block/response-block.component';
 import { HistoryBlockComponent } from './work-page/history-block/history-block.component';
 import { StoragePageComponent } from './storage-page/storage-page.component';
+import { PipesModule } from '../pipes/pipes.module';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { StoragePageComponent } from './storage-page/storage-page.component';
     FormsModule,
     ReactiveFormsModule,
     MatStepperModule,
+    PipesModule,
   ],
   exports: [
     HeaderComponent,
