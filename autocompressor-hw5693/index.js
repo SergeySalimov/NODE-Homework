@@ -22,6 +22,7 @@ if (process.argv.length <= 2) {
 
 async function compressFile(file) {
   const startTime = Date.now();
+  messageLog(`${file} is started to compressed!`);
   try {
     await pipeline(
       fs.createReadStream(file),
