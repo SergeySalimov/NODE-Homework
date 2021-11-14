@@ -2,14 +2,24 @@ import express from 'express';
 import path from 'path';
 import fetch from 'isomorphic-fetch';
 import fs from 'fs';
+import cors from 'cors';
 import { logLineAsync, getNewId, checkIdValidity } from '../share/helper-es6';
+import WebSocket from 'ws';
 
 const webServer = express();
 const PORT = 7780;
+const PORT2 = 7781;
 const API = '/api';
+const CORS_OPTIONS = {
+  origin: '*', // разрешаем запросы с любого origin, вместо * здесь может быть ОДИН origin
+  optionsSuccessStatus: 200, // на preflight-запрос OPTIONS отвечать кодом ответа 200
+};
 const pathToAppDist = '/postman/dist/postman/';
 const logPath = path.join(__dirname, '_server.log');
 const historyPath = path.join(__dirname, 'data/history.json');
+
+// const socketServer = new WebSocket.Server({ port: PORT2});
+// logLineAsync(`Websocket server has been started on port ${PORT2}`);
 
 webServer.use(express.urlencoded({ extended: true }));
 webServer.use(express.json({ extended: true }));
@@ -19,10 +29,8 @@ webServer.use((req, res, next) => {
 });
 webServer.use(express.static(process.cwd() + pathToAppDist));
 
-webServer.get(`${API}/histories`, (req, res) => {
+webServer.get(`${API}/histories`, cors(CORS_OPTIONS), (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=0');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
   
   try {
@@ -35,7 +43,7 @@ webServer.get(`${API}/histories`, (req, res) => {
   }
 });
 
-webServer.get(`${API}/histories/:id`, (req, res) => {
+webServer.get(`${API}/histories/:id`, cors(CORS_OPTIONS), (req, res) => {
   const { id } = req.params;
   
   if (!checkIdValidity(id, logPath, PORT)) {
@@ -43,10 +51,7 @@ webServer.get(`${API}/histories/:id`, (req, res) => {
   }
   
   res.setHeader('Cache-Control', 'public, max-age=0');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Content-Type', 'application/json');
-  
   
   try {
     const historyJson = fs.readFileSync(historyPath, 'utf-8');
@@ -98,11 +103,7 @@ webServer.delete(`${API}/histories/:id`, (req, res) => {
   res.status(204).end();
 });
 
-webServer.options(`${API}/requests`, (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.send('');
-});
+webServer.options(`${API}/requests`, cors(CORS_OPTIONS));
 
 webServer.post(`${API}/requests`, async (req, res) => {
   const { type, url, body, headers } = req.body;
@@ -152,8 +153,6 @@ webServer.post(`${API}/requests`, async (req, res) => {
     url: proxy_response.url,
   };
   
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Cache-Control', 'public, max-age=0');
   res.setHeader('Content-Type', 'application/text');
   
