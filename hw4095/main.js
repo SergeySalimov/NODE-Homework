@@ -3,6 +3,7 @@ import path from 'path';
 import fetch from 'isomorphic-fetch';
 import fs from 'fs';
 import cors from 'cors';
+import busboy from 'connect-busboy';
 import { logLineAsync, getNewId, checkIdValidity } from '../share/helper-es6';
 import WebSocket from 'ws';
 
@@ -17,6 +18,8 @@ const CORS_OPTIONS = {
 const pathToAppDist = '/postman/dist/postman/';
 const logPath = path.join(__dirname, '_server.log');
 const historyPath = path.join(__dirname, 'data/history.json');
+const uploadDataPath = path.join(__dirname, 'data/upload-data.json');
+const uploadDirPath = path.join(__dirname, 'uploaded');
 
 // const socketServer = new WebSocket.Server({ port: PORT2});
 // logLineAsync(`Websocket server has been started on port ${PORT2}`);
@@ -175,6 +178,76 @@ webServer.post(`${API}/requests`, async (req, res) => {
   }
   
   res.end();
+});
+
+webServer.options(`${API}/upload-file`, cors(CORS_OPTIONS));
+
+webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
+  const totalRequestLength = +req.headers['content-length'];
+  let totalDownloaded = 0;
+  
+  let uploadData;
+  if (fs.existsSync(uploadDataPath)) {
+    try {
+      const uploadDataJson = fs.readFileSync(uploadDataPath, 'utf-8');
+      uploadData = JSON.parse(uploadDataJson);
+    } catch (e) {
+      logLineAsync(`[${PORT}] error of reading uploadData`, logPath);
+      return res.status(422).end();
+    }
+  } else {
+    uploadData = [];
+  }
+  
+  let reqFields = {};
+  let reqFiles = {};
+  let newFileName;
+  let newFilePath;
+  
+  req.pipe(req.busboy);// перенаправляем поток приёма ответа в busboy
+  
+  req.busboy.on('field', (fieldName, value) => {
+    reqFields[fieldName] = value;
+  });
+  
+  req.busboy.on('file', (fieldName, file, originalName, mimetype) => {
+    do {
+      newFileName = getNewId();
+      newFilePath = path.resolve(uploadDirPath, newFileName);
+    } while (fs.existsSync(newFilePath));
+    
+    reqFiles[newFileName] = { originalName, newFilePath };
+  
+    logLineAsync(`[${PORT}] uploading of ${originalName} started`, logPath);
+  
+    const writeStream = fs.createWriteStream(newFilePath);
+
+    file.pipe(writeStream);
+  
+    file.on('data', data => {
+      totalDownloaded += data.length;
+      console.log(`loaded ${totalDownloaded} bytes of ${totalRequestLength}`);
+    });
+
+    file.on('end', () => {
+      logLineAsync(`[${PORT}] file ${originalName} was received`, logPath);
+      reqFiles[newFileName].totalLength = totalDownloaded;
+    });
+  });
+  
+  req.busboy.on('finish', () => {
+    logLineAsync(`[${PORT}] download complete!`, logPath);
+    reqFiles[newFileName].comment = reqFields.comment;
+    uploadData.push(reqFiles);
+    try {
+      fs.writeFileSync(uploadDataPath, JSON.stringify(uploadData), 'utf-8');
+      logLineAsync(`[${PORT}] upload data file was successfully updated`, logPath);
+    } catch (e) {
+      logLineAsync(`[${PORT}] error of saving upload data`, logPath);
+    }
+  
+    res.end();
+  });
 });
 
 webServer.get('*', (req, res) => {
