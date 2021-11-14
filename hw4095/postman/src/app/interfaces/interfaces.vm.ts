@@ -11,5 +11,5 @@ export interface RequestForm {
   headers: KeyValueInterface[];
   body: string;
   query?: KeyValueInterface[];
-  id?: string,
+  id?: string;
 }

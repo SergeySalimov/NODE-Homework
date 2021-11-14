@@ -13,6 +13,10 @@
     width: var(--sidenav-width);
   }
 
+  .mat-sidenav .icon {
+    margin-right: 7px;
+  }
+
   .mat-toolbar.mat-toolbar-single-row {
     height: var(--header-height);
   }
@@ -30,6 +34,7 @@
       cursor: pointer;
 
       li {
+        margin: 0 10px;
 
         a {
           padding: 14px 12px;

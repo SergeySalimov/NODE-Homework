@@ -41,4 +41,16 @@ export class PostmanService {
       finalize(() => this.$isLoaded.next(false)),
     );
   }
+
+  uploadFiles(file: File, comment: string): any {
+    const formData = new FormData();
+
+    formData.append('file', file);
+    formData.append('comment', comment);
+
+    return this.http.post(
+      `${this.rootURL}/upload-file`,
+      formData,
+      ).subscribe();
+  }
 }

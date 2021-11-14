@@ -13,6 +13,7 @@ import { WorkPageComponent } from './work-page/work-page.component';
 import { RequestBlockComponent } from './work-page/request-block/request-block.component';
 import { ResponseBlockComponent } from './work-page/response-block/response-block.component';
 import { HistoryBlockComponent } from './work-page/history-block/history-block.component';
+import { StoragePageComponent } from './storage-page/storage-page.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { HistoryBlockComponent } from './work-page/history-block/history-block.c
     RequestBlockComponent,
     ResponseBlockComponent,
     HistoryBlockComponent,
+    StoragePageComponent,
   ],
   imports: [
     CommonModule,

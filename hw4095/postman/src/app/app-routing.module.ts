@@ -4,6 +4,7 @@ import { HomePageComponent } from './ui/home-page/home-page.component';
 import { NotFoundPageComponent } from './ui/not-found-page/not-found-page.component';
 import { WorkPageComponent } from './ui/work-page/work-page.component';
 import { RouteEnum } from './app-routing.constant';
+import { StoragePageComponent } from './ui/storage-page/storage-page.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,9 @@ const routes: Routes = [
   },
   {
     path: RouteEnum.WORK, component: WorkPageComponent,
+  },
+  {
+    path: RouteEnum.STORAGE, component: StoragePageComponent,
   },
   {
     path: '**', component: NotFoundPageComponent,
