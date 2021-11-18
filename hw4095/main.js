@@ -25,40 +25,16 @@ const webSocketServer = new WebSocket.Server({ port: WS_PORT});
 logLineAsync(`Websocket server has been created on port ${WS_PORT}`);
 let webSocketClients = [];
 
-webSocketServer.on('connection', connection => {
-  logLineAsync(`${WS_PORT} new websocket connection established`);
-  let newClient;
-  
-  connection.on('message', data => {
-    const message = data.toString();
-    if (message.startsWith('TOKEN')) {
-      if (webSocketClients.some(client => client.token === message)) {
-        connection.terminate();
-        logLineAsync(`[${WS_PORT}] there are too many connections for client ${message}. Connection was terminated`, logPath);
-      } else {
-        newClient = { connection, token: message, keepAliveTo: addTimeFromNow(5), active: true };
-        webSocketClients.push(newClient);
-        logLineAsync(`[${WS_PORT}] new client ${newClient.token} was added`, logPath);
-      }
-    } else {
-      logLineAsync(`[${WS_PORT}] message from client received. Message: ${shortMessage(message)}`, logPath);
-    }
-  });
-  
-  connection.on('error', error => {
-    logLineAsync(`[${WS_PORT}] Error: ${shortMessage(error, 50)}`, logPath);
-  });
-});
-
 webServer.use(express.urlencoded({ extended: true }));
 webServer.use(express.json({ extended: true }));
+webServer.use(cors(CORS_OPTIONS));
 webServer.use((req, res, next) => {
   logLineAsync(`[${PORT}] url=${req.originalUrl} called`, logPath);
   next();
 });
 webServer.use(express.static(process.cwd() + pathToAppDist));
 
-webServer.get(`${API}/histories`, cors(CORS_OPTIONS), (req, res) => {
+webServer.get(`${API}/histories`, (req, res) => {
   res.setHeader('Cache-Control', 'public, max-age=0');
   res.setHeader('Content-Type', 'application/json');
   
@@ -72,7 +48,7 @@ webServer.get(`${API}/histories`, cors(CORS_OPTIONS), (req, res) => {
   }
 });
 
-webServer.get(`${API}/histories/:id`, cors(CORS_OPTIONS), (req, res) => {
+webServer.get(`${API}/histories/:id`, (req, res) => {
   const { id } = req.params;
   
   if (!checkIdValidity(id, logPath, PORT)) {
@@ -132,7 +108,7 @@ webServer.delete(`${API}/histories/:id`, (req, res) => {
   res.status(204).end();
 });
 
-webServer.options(`${API}/requests`, cors(CORS_OPTIONS));
+webServer.options(`${API}/requests`);
 
 webServer.post(`${API}/requests`, async (req, res) => {
   const { type, url, body, headers } = req.body;
@@ -206,7 +182,7 @@ webServer.post(`${API}/requests`, async (req, res) => {
   res.end();
 });
 
-webServer.options(`${API}/upload-file`, cors(CORS_OPTIONS));
+webServer.options(`${API}/upload-file`);
 
 webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
   let uploadData;
@@ -308,6 +284,31 @@ webServer.get('*', (req, res) => {
 
 webServer.listen(PORT, () => {
   logLineAsync(`Backend server has been started on port ${PORT} in ${process.env.NODE_ENV} mode ......`, logPath);
+});
+
+webSocketServer.on('connection', connection => {
+  logLineAsync(`${WS_PORT} new websocket connection established`);
+  let newClient;
+  
+  connection.on('message', data => {
+    const message = data.toString();
+    if (message.startsWith('TOKEN')) {
+      if (webSocketClients.some(client => client.token === message)) {
+        connection.terminate();
+        logLineAsync(`[${WS_PORT}] there are too many connections for client ${message}. Connection was terminated`, logPath);
+      } else {
+        newClient = { connection, token: message, keepAliveTo: addTimeFromNow(5), active: true };
+        webSocketClients.push(newClient);
+        logLineAsync(`[${WS_PORT}] new client ${newClient.token} was added`, logPath);
+      }
+    } else {
+      logLineAsync(`[${WS_PORT}] message from client received. Message: ${shortMessage(message)}`, logPath);
+    }
+  });
+  
+  connection.on('error', error => {
+    logLineAsync(`[${WS_PORT}] Error: ${shortMessage(error, 50)}`, logPath);
+  });
 });
 
 setInterval(() => {
