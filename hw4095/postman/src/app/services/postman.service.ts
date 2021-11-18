@@ -13,10 +13,12 @@ export class PostmanService {
   history$: Observable<HistoryDto> = this.$history.asObservable();
   private $response: Subject<ResponseDto> = new Subject<ResponseDto>();
   response$: Observable<ResponseDto> = this.$response.asObservable();
-  private $uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  $uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   uploadProgress$: Observable<number> = this.$uploadProgress.asObservable();
   private $disableLoadButton: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   disableLoadButton$: Observable<boolean> = this.$disableLoadButton.asObservable();
+  $uploadFileList: BehaviorSubject<UploadFileDto[]> = new BehaviorSubject<UploadFileDto[]>([]);
+  uploadFileList$: Observable<UploadFileDto[]> = this.$uploadFileList.asObservable();
 
   rootURL = '/api';
 
@@ -45,6 +47,15 @@ export class PostmanService {
     return this.http.delete<void>(`${this.rootURL}/histories/${id}`).pipe(
       finalize(() => this.$isLoaded.next(false)),
     );
+  }
+
+  getUploadFileList(): void {
+    this.$isLoaded.next(true);
+    this.http.get<UploadFileDto[]>(`${this.rootURL}/list-of-upload-files`).pipe(
+      finalize(() => this.$isLoaded.next(false)),
+    ).subscribe(data => {
+      this.$uploadFileList.next(data);
+    });
   }
 
   uploadFiles(file: File, comment: string): Observable<UploadFileDto> {
