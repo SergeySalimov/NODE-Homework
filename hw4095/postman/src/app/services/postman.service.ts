@@ -67,6 +67,13 @@ export class PostmanService {
       .catch(err => console.log(err));
   }
 
+  deleteDownloadedFile(id: string): Observable<void> {
+    this.$isLoaded.next(true);
+    return this.http.delete<void>(`${this.rootURL}/upload-file/${id}`).pipe(
+      finalize(() => this.$isLoaded.next(false)),
+    );
+  }
+
   uploadFiles(file: File, comment: string): Observable<UploadFileDto> {
     this.$disableLoadButton.next(true);
 

@@ -108,7 +108,7 @@ webServer.delete(`${API}/histories/:id`, (req, res) => {
     fs.writeFileSync(historyPath, JSON.stringify(history), 'utf-8');
     logLineAsync(`[${PORT}] history file was successfully deleted`, logPath);
   } catch (e) {
-    logLineAsync(`[${PORT}] error of deleting history`, logPath);
+    logLineAsync(`[${PORT}] ERROR of deleting history`, logPath);
     return res.status(422).end();
   }
   
@@ -140,7 +140,7 @@ webServer.post(`${API}/requests`, async (req, res) => {
   try {
     proxy_response = await fetch(url, options);
   } catch (e) {
-    logLineAsync(`[${PORT}] fetch request return error`, logPath);
+    logLineAsync(`[${PORT}] ERROR, fetch request return error`, logPath);
     res.status(400).end();
   }
   
@@ -183,7 +183,7 @@ webServer.post(`${API}/requests`, async (req, res) => {
     fs.writeFileSync(historyPath, JSON.stringify(history), 'utf-8');
     logLineAsync(`[${PORT}] history file was successfully updated`, logPath);
   } catch (e) {
-    logLineAsync(`[${PORT}] error of saving history`, logPath);
+    logLineAsync(`[${PORT}] ERROR of saving history`, logPath);
   }
   
   res.end();
@@ -200,7 +200,7 @@ webServer.get(`${API}/list-of-upload-files`, (req, res) => {
       const uploadData = JSON.parse(uploadDataJson);
       res.status(200).send(uploadData.map(el => createSecureUploadData(el))).end();
     } catch (e) {
-      logLineAsync(`[${PORT}] error of reading uploadData`, logPath);
+      logLineAsync(`[${PORT}] ERROR of reading uploadData`, logPath);
       return res.status(422).end();
     }
   } else {
@@ -209,7 +209,7 @@ webServer.get(`${API}/list-of-upload-files`, (req, res) => {
   }
 });
 
-webServer.get(`${API}/upload-file/:id`, async (req, res, next) => {
+webServer.get(`${API}/upload-file/:id`, (req, res) => {
   const { id } = req.params;
   let uploadData;
   
@@ -217,7 +217,7 @@ webServer.get(`${API}/upload-file/:id`, async (req, res, next) => {
     const uploadDataJson = fs.readFileSync(uploadDataPath, 'utf-8');
     uploadData = JSON.parse(uploadDataJson);
   } catch (e) {
-    logLineAsync(`[${PORT}] error of reading uploadData`, logPath);
+    logLineAsync(`[${PORT}] ERROR of reading uploadData`, logPath);
     return res.status(422).end();
   }
   
@@ -237,19 +237,66 @@ webServer.get(`${API}/upload-file/:id`, async (req, res, next) => {
         
         res.download(newFilePath, fileName, (err) => {
           if (err) {
-            logLineAsync(`[${PORT}] error in process of upload file: "${originalName}"`, logPath);
+            logLineAsync(`[${PORT}] ERROR in process of upload file: "${originalName}"`, logPath);
           } else {
             logLineAsync(`[${PORT}] successful upload of file: "${originalName}"`, logPath);
           }
         });
       } catch (e) {
-        logLineAsync(`[${PORT}] error of sending file from: ${newFilePath}`, logPath);
+        logLineAsync(`[${PORT}] ERROR of sending file from: ${newFilePath}`, logPath);
         return res.status(422).end();
       }
     } else {
+      logLineAsync(`[${PORT}] ERROR, file does not exist on path: ${newFilePath}`, logPath);
       res.status(404).end();
     }
   } else {
+    logLineAsync(`[${PORT}] ERROR, file for id: ${id} does not exist in upload data`, logPath);
+    res.status(404).end();
+  }
+});
+
+webServer.delete(`${API}/upload-file/:id`, (req, res) => {
+  const { id } = req.params;
+  let uploadData;
+  
+  try {
+    const uploadDataJson = fs.readFileSync(uploadDataPath, 'utf-8');
+    uploadData = JSON.parse(uploadDataJson);
+  } catch (e) {
+    logLineAsync(`[${PORT}] ERROR of reading uploadData`, logPath);
+    return res.status(422).end();
+  }
+  
+  const uploadFileIndex = uploadData.findIndex(data => id in data);
+  
+  if (uploadFileIndex >= 0) {
+    const removedUploadFile = uploadData.splice(uploadFileIndex, 1)[0];
+    const { newFilePath: removedFilePath, originalName } = removedUploadFile[id];
+  
+    if (fs.existsSync(removedFilePath)) {
+      try {
+        fs.unlink(removedFilePath, err => {
+          if (err) {
+            logLineAsync(`[${PORT}] ERROR in deleting of file: "${originalName}", path: ${removedFilePath}`, logPath);
+            res.status(422).end();
+          } else {
+            logLineAsync(`[${PORT}] file was deleted: "${originalName}", path: ${removedFilePath}`, logPath);
+            fs.writeFileSync(uploadDataPath, JSON.stringify(uploadData), 'utf-8');
+            logLineAsync(`[${PORT}] upload data was successfully updated`, logPath);
+            res.status(200).end();
+          }
+        });
+      } catch (e) {
+        logLineAsync(`[${PORT}] ERROR occurred while deleting of file: "${originalName}", path: ${removedFilePath}`, logPath);
+        res.status(422).end();
+      }
+    } else {
+      logLineAsync(`[${PORT}] ERROR, file does not exist on path: ${removedFilePath}`, logPath);
+      res.status(404).end();
+    }
+  } else {
+    logLineAsync(`[${PORT}] ERROR finding file with id: ${id} in upload data`, logPath);
     res.status(404).end();
   }
 });
@@ -263,7 +310,7 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
       const uploadDataJson = fs.readFileSync(uploadDataPath, 'utf-8');
       uploadData = JSON.parse(uploadDataJson);
     } catch (e) {
-      logLineAsync(`[${PORT}] error of reading uploadData`, logPath);
+      logLineAsync(`[${PORT}] ERROR of reading uploadData`, logPath);
       return res.status(422).end();
     }
   } else {
@@ -329,7 +376,7 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
       fs.writeFileSync(uploadDataPath, JSON.stringify(uploadData), 'utf-8');
       logLineAsync(`[${PORT}] upload data file was successfully updated`, logPath);
     } catch (e) {
-      logLineAsync(`[${PORT}] error of saving upload data`, logPath);
+      logLineAsync(`[${PORT}] ERROR of saving upload data`, logPath);
       return res.status(422).end;
     }
     
@@ -372,7 +419,7 @@ webSocketServer.on('connection', connection => {
   });
   
   connection.on('error', error => {
-    logLineAsync(`[${WS_PORT}] Error: ${shortMessage(error, 50)}`, logPath);
+    logLineAsync(`[${WS_PORT}] ERROR: ${shortMessage(error, 50)}`, logPath);
   });
 });
 
