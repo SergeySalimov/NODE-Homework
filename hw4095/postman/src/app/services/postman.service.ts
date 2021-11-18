@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { HistoryDto, RequestDto, ResponseDto, UploadFileDto } from '../interfaces/interfaces.dto';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 @Injectable()
@@ -53,6 +53,7 @@ export class PostmanService {
     this.$isLoaded.next(true);
     this.http.get<UploadFileDto[]>(`${this.rootURL}/list-of-upload-files`).pipe(
       finalize(() => this.$isLoaded.next(false)),
+      map((data: UploadFileDto[]) => data.map((el, i) => ({ ...el, position: i + 1 }))),
     ).subscribe(data => {
       this.$uploadFileList.next(data);
     });

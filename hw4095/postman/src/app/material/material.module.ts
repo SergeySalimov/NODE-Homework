@@ -17,6 +17,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
 
 const materialModules = [
   MatSidenavModule,
@@ -37,6 +38,7 @@ const materialModules = [
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatSelectModule,
+  MatTableModule,
 ];
 
 @NgModule({

@@ -15,6 +15,8 @@ import { ResponseBlockComponent } from './work-page/response-block/response-bloc
 import { HistoryBlockComponent } from './work-page/history-block/history-block.component';
 import { StoragePageComponent } from './storage-page/storage-page.component';
 import { PipesModule } from '../pipes/pipes.module';
+import { StoragePageUploadComponent } from './storage-page/storage-page-upload/storage-page-upload.component';
+import { StoragePageTableComponent } from './storage-page/storage-page-table/storage-page-table.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { PipesModule } from '../pipes/pipes.module';
     ResponseBlockComponent,
     HistoryBlockComponent,
     StoragePageComponent,
+    StoragePageUploadComponent,
+    StoragePageTableComponent,
   ],
   imports: [
     CommonModule,

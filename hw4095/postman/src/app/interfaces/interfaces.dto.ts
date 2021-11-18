@@ -27,6 +27,7 @@ export interface UploadFileDto {
   comment: string;
   originalName: string;
   totalLength: number;
+  position?: number;
 }
 
 export type HistoryDto = Array<History>;
