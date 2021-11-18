@@ -348,13 +348,13 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
     
     const writeStream = fs.createWriteStream(newFilePath);
     file.pipe(writeStream);
-    
+  
     file.on('data', data => {
       totalDownloaded += data.length;
       if (webSocketClient) {
         const progress = Math.round(totalDownloaded / totalFileLength * 100);
         webSocketClient.connection.send(`progress:${progress}`);
-        webSocketClient.keepAliveTo = addTimeFromNow(3);
+        webSocketClient.keepAliveTo = addTimeFromNow(7);
       }
     });
     
@@ -409,7 +409,7 @@ webSocketServer.on('connection', connection => {
         connection.terminate();
         logLineAsync(`[${WS_PORT}] there are too many connections for client ${message}. Connection was terminated`, logPath);
       } else {
-        newClient = { connection, token: message, keepAliveTo: addTimeFromNow(5), active: true };
+        newClient = { connection, token: message, keepAliveTo: addTimeFromNow(7), active: true };
         webSocketClients.push(newClient);
         logLineAsync(`[${WS_PORT}] new client ${newClient.token} was added`, logPath);
       }
