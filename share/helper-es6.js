@@ -85,6 +85,17 @@ function shortMessage(message, cutOn = 15) {
   return message.length > cutOn ? `${message.slice((cutOn - 3))}...` : message;
 }
 
+function createSecureUploadData(obj) {
+  const key = Object.keys(obj)[0];
+  
+  return {
+    id: key,
+    comment: obj[key].comment,
+    originalName: obj[key].originalName,
+    totalLength: obj[key].totalLength,
+  };
+}
+
 export {
   logLineSync,
   logLineAsync,
@@ -93,4 +104,5 @@ export {
   checkIdValidity,
   addTimeFromNow,
   shortMessage,
+  createSecureUploadData,
 };

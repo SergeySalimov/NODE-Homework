@@ -4,7 +4,14 @@ import fetch from 'isomorphic-fetch';
 import fs from 'fs';
 import cors from 'cors';
 import busboy from 'connect-busboy';
-import { logLineAsync, getNewId, checkIdValidity, addTimeFromNow, shortMessage } from '../share/helper-es6';
+import {
+  addTimeFromNow,
+  checkIdValidity,
+  createSecureUploadData,
+  getNewId,
+  logLineAsync,
+  shortMessage,
+} from '../share/helper-es6';
 import WebSocket from 'ws';
 
 const webServer = express();
@@ -39,9 +46,9 @@ webServer.get(`${API}/histories`, (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   
   try {
-    logLineAsync(`[${PORT}] history was send`, logPath);
     const historyJson = fs.readFileSync(historyPath, 'utf-8');
-    res.send(historyJson).end();
+    logLineAsync(`[${PORT}] history was send`, logPath);
+    res.status(200).send(historyJson).end();
   } catch (e) {
     logLineAsync(`[${PORT}] history is not exist return null`, logPath);
     res.status(204).send([]).end();
@@ -182,6 +189,26 @@ webServer.post(`${API}/requests`, async (req, res) => {
   res.end();
 });
 
+webServer.get(`${API}/list-of-upload-files`, (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=0');
+  res.setHeader('Content-Type', 'application/json');
+  
+  if (fs.existsSync(uploadDataPath)) {
+    try {
+      const uploadDataJson = fs.readFileSync(uploadDataPath, 'utf-8');
+      logLineAsync(`[${PORT}] uploadData was send`, logPath);
+      const uploadData = JSON.parse(uploadDataJson);
+      res.status(200).send(uploadData.map(el => createSecureUploadData(el))).end();
+    } catch (e) {
+      logLineAsync(`[${PORT}] error of reading uploadData`, logPath);
+      return res.status(422).end();
+    }
+  } else {
+    logLineAsync(`[${PORT}] uploadData not exist, sent null`, logPath);
+    res.status(204).send([]).end();
+  }
+});
+
 webServer.options(`${API}/upload-file`);
 
 webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
@@ -267,14 +294,7 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
       webSocketClient.active = false;
     }
     
-    const data = {
-      id: newFileName,
-      comment: reqFiles[newFileName].comment,
-      originalName: reqFiles[newFileName].originalName,
-      totalLength: reqFiles[newFileName].totalLength,
-    };
-    
-    res.status(200).send(data).end();
+    res.status(200).send(createSecureUploadData(reqFiles)).end();
   });
 });
 
