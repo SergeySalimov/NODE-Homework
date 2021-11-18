@@ -399,7 +399,7 @@ webServer.listen(PORT, () => {
 });
 
 webSocketServer.on('connection', connection => {
-  logLineAsync(`${WS_PORT} new websocket connection established`);
+  logLineAsync(`[${WS_PORT}] new websocket connection established`);
   let newClient;
   
   connection.on('message', data => {
@@ -412,6 +412,7 @@ webSocketServer.on('connection', connection => {
         newClient = { connection, token: message, keepAliveTo: addTimeFromNow(7), active: true };
         webSocketClients.push(newClient);
         logLineAsync(`[${WS_PORT}] new client ${newClient.token} was added`, logPath);
+        connection.send('321start');
       }
     } else {
       logLineAsync(`[${WS_PORT}] message from client received. Message: ${shortMessage(message)}`, logPath);

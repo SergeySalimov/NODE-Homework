@@ -4,6 +4,7 @@ import { UploadStatusEnum } from '../../../interfaces/constant';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PostmanService } from '../../../services/postman.service';
 import { finalize, takeUntil } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-storage-page-upload',
@@ -44,18 +45,40 @@ export class StoragePageUploadComponent implements OnInit, OnDestroy {
   }
 
   onSubmitUpload(): void {
-    this.uploadStatus = UploadStatusEnum.PROGRESS;
-    const { comments } = this.uploadForm.getRawValue();
-    this.uploadForm.disable();
-    this.ps.uploadFiles(this.files[0], comments).pipe(
-      finalize(() => {
-        setTimeout(() => this.uploadStatus = UploadStatusEnum.DONE, 500);
-        this.uploadForm.reset({ files: null, comments: ''});
-        this.ps.getUploadFileList();
-        this.uploadForm.enable();
-      }),
-      takeUntil(this.destroy$),
-    ).subscribe();
+    // ToDo need to add here real session token
+    const sessionToken: string = 'TOKEN:' + (Date.now().toString(36) + Math.random().toString(36).substring(2, 15));
+
+    // open webSocket
+    const wsUrl: string = environment.webSocketUrl;
+    const connection: WebSocket = new WebSocket(wsUrl);
+
+    connection.onopen = () => {
+      connection.send(sessionToken);
+    };
+    connection.onmessage = (event) => {
+      const message: string = event.data;
+      if (message.startsWith('progress:')) {
+        const progress: string = message.slice(9);
+        this.ps.$uploadProgress.next(+progress);
+      } else if (message.startsWith('321start')) {
+        this.uploadStatus = UploadStatusEnum.PROGRESS;
+        const { comments } = this.uploadForm.getRawValue();
+        this.uploadForm.disable();
+        this.ps.uploadFiles(this.files[0], comments, sessionToken).pipe(
+          finalize(() => {
+            setTimeout(() => this.uploadStatus = UploadStatusEnum.DONE, 500);
+            this.uploadForm.reset({ files: null, comments: ''});
+            this.ps.getUploadFileList();
+            this.uploadForm.enable();
+          }),
+          takeUntil(this.destroy$),
+        ).subscribe();
+      }
+    };
+    connection.onerror = (event) => {
+      // ToDo add show toast here
+      console.log('error on webSocket: ', event);
+    };
   }
 
   prepareFiles(files: any): void {

@@ -3,7 +3,6 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { HistoryDto, RequestDto, ResponseDto, UploadFileDto } from '../interfaces/interfaces.dto';
 import { finalize, map } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
 import { saveAs as importedSaveAs } from 'file-saver';
 
 @Injectable()
@@ -74,7 +73,7 @@ export class PostmanService {
     );
   }
 
-  uploadFiles(file: File, comment: string): Observable<UploadFileDto> {
+  uploadFiles(file: File, comment: string, sessionToken: string): Observable<UploadFileDto> {
     this.$disableLoadButton.next(true);
 
     const formData: FormData = new FormData();
@@ -82,28 +81,6 @@ export class PostmanService {
 
     formData.append('file', file);
     formData.append('comment', comment);
-
-    // ToDo need to add here real session token
-    const sessionToken: string = 'TOKEN:' + (Date.now().toString(36) + Math.random().toString(36).substring(2, 15));
-
-    // open webSocket
-    const wsUrl: string = environment.webSocketUrl;
-    const connection: WebSocket = new WebSocket(wsUrl);
-
-    connection.onopen = () => {
-      connection.send(sessionToken);
-    };
-    connection.onmessage = (event) => {
-      const message: string = event.data;
-      if (message.startsWith('progress:')) {
-        const progress: string = message.slice(9);
-        this.$uploadProgress.next(+progress);
-      }
-    };
-    connection.onerror = (event) => {
-      // ToDo add show toast here
-      console.log('error on webSocket: ', event);
-    };
 
     return this.http.post<UploadFileDto>(
       `${this.rootURL}/upload-file`,
@@ -117,7 +94,6 @@ export class PostmanService {
     ).pipe(
       finalize(() => {
         this.$disableLoadButton.next(false);
-        connection.close();
       }),
     );
   }
