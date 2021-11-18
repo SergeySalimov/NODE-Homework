@@ -47,7 +47,7 @@ export class StoragePageUploadComponent implements OnInit, OnDestroy {
     this.ps.uploadFiles(this.files[0], comments).pipe(
       finalize(() => {
         setTimeout(() => this.uploadStatus = UploadStatusEnum.DONE, 500);
-        this.uploadForm.reset();
+        this.uploadForm.reset({ files: null, comments: ''});
         this.ps.getUploadFileList();
       }),
       takeUntil(this.destroy$),
