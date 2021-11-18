@@ -24,7 +24,7 @@
     <ng-container matColumnDef="action">
       <th mat-header-cell *matHeaderCellDef> Action</th>
       <td mat-cell *matCellDef="let element" style="width: 128px; padding-right: 0;">
-        <button mat-icon-button color="primary" (click)="loadFile(element.id)">
+        <button mat-icon-button color="primary" (click)="loadFile(element.id, element.originalName)">
           <mat-icon>save</mat-icon>
         </button>
         <button mat-icon-button (click)="deleteFile(element.id)">

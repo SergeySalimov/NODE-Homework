@@ -18,8 +18,9 @@ export class StoragePageTableComponent implements OnInit {
     this.ps.getUploadFileList();
   }
 
-  loadFile(id: string): void {
-    console.log(id);
+  loadFile(id: string, fileName: string): void {
+    console.log(fileName);
+    this.ps.downloadFile(id, fileName);
   }
 
   deleteFile(id: string): void {

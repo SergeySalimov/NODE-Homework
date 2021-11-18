@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { HistoryDto, RequestDto, ResponseDto, UploadFileDto } from '../interfaces/interfaces.dto';
 import { finalize, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { saveAs as importedSaveAs } from 'file-saver';
 
 @Injectable()
 export class PostmanService {
@@ -57,6 +58,13 @@ export class PostmanService {
     ).subscribe(data => {
       this.$uploadFileList.next(data);
     });
+  }
+
+  downloadFile(id: string, fileName: string): void {
+    this.http.get<void>(`${this.rootURL}/upload-file/${id}`, { responseType: 'blob' as any})
+      .toPromise()
+      .then(blob => importedSaveAs(blob, fileName))
+      .catch(err => console.log(err));
   }
 
   uploadFiles(file: File, comment: string): Observable<UploadFileDto> {

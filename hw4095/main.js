@@ -28,7 +28,7 @@ const historyPath = path.join(__dirname, 'data/history.json');
 const uploadDataPath = path.join(__dirname, 'data/upload-data.json');
 const uploadDirPath = path.join(__dirname, 'uploaded');
 
-const webSocketServer = new WebSocket.Server({ port: WS_PORT});
+const webSocketServer = new WebSocket.Server({ port: WS_PORT });
 logLineAsync(`Websocket server has been created on port ${WS_PORT}`);
 let webSocketClients = [];
 
@@ -209,6 +209,51 @@ webServer.get(`${API}/list-of-upload-files`, (req, res) => {
   }
 });
 
+webServer.get(`${API}/upload-file/:id`, async (req, res, next) => {
+  const { id } = req.params;
+  let uploadData;
+  
+  try {
+    const uploadDataJson = fs.readFileSync(uploadDataPath, 'utf-8');
+    uploadData = JSON.parse(uploadDataJson);
+  } catch (e) {
+    logLineAsync(`[${PORT}] error of reading uploadData`, logPath);
+    return res.status(422).end();
+  }
+  
+  const uploadFile = uploadData.find(data => id in data);
+  
+  if (uploadFile) {
+    const { newFilePath, totalLength, originalName } = uploadFile[id];
+    
+    if (fs.existsSync(newFilePath)) {
+      try {
+        const fileName = encodeURI(originalName);
+        
+        res.setHeader('Cache-Control', 'private, max-age=0');
+        res.setHeader('Content-Length', totalLength);
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        
+        res.download(newFilePath, fileName, (err) => {
+          if (err) {
+            logLineAsync(`[${PORT}] error in process of upload file: "${originalName}"`, logPath);
+          } else {
+            logLineAsync(`[${PORT}] successful upload of file: "${originalName}"`, logPath);
+          }
+        });
+      } catch (e) {
+        logLineAsync(`[${PORT}] error of sending file from: ${newFilePath}`, logPath);
+        return res.status(422).end();
+      }
+    } else {
+      res.status(404).end();
+    }
+  } else {
+    res.status(404).end();
+  }
+});
+
 webServer.options(`${API}/upload-file`);
 
 webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
@@ -253,10 +298,10 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
     
     reqFiles[newFileName] = { originalName, newFilePath };
     logLineAsync(`[${PORT}] uploading of ${originalName} started`, logPath);
-  
+    
     const writeStream = fs.createWriteStream(newFilePath);
     file.pipe(writeStream);
-  
+    
     file.on('data', data => {
       totalDownloaded += data.length;
       if (webSocketClient) {
@@ -265,7 +310,7 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
         webSocketClient.keepAliveTo = addTimeFromNow(3);
       }
     });
-
+    
     file.on('end', () => {
       logLineAsync(`[${PORT}] file ${originalName} was received`, logPath);
       reqFiles[newFileName].totalLength = totalDownloaded;
@@ -287,7 +332,7 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
       logLineAsync(`[${PORT}] error of saving upload data`, logPath);
       return res.status(422).end;
     }
-  
+    
     if (webSocketClient) {
       webSocketClient.connection.terminate();
       logLineAsync(`[${WS_PORT}] connection with client ${token} was closed`, logPath);
