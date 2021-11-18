@@ -22,4 +22,11 @@ export interface History extends RequestDto {
   created: Date;
 }
 
+export interface UploadFileDto {
+  id: string;
+  comment: string;
+  originalName: string;
+  totalLength: number;
+}
+
 export type HistoryDto = Array<History>;

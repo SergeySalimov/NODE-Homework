@@ -77,10 +77,20 @@ function checkIdValidity(id, logPath, PORT) {
   return true;
 }
 
+function addTimeFromNow(sec = 5) {
+  return Date.now() + sec * 1000;
+}
+
+function shortMessage(message, cutOn = 15) {
+  return message.length > cutOn ? `${message.slice((cutOn - 3))}...` : message;
+}
+
 export {
   logLineSync,
   logLineAsync,
   removeDuplicated,
   getNewId,
   checkIdValidity,
+  addTimeFromNow,
+  shortMessage,
 };

@@ -4,12 +4,12 @@ import fetch from 'isomorphic-fetch';
 import fs from 'fs';
 import cors from 'cors';
 import busboy from 'connect-busboy';
-import { logLineAsync, getNewId, checkIdValidity } from '../share/helper-es6';
+import { logLineAsync, getNewId, checkIdValidity, addTimeFromNow, shortMessage } from '../share/helper-es6';
 import WebSocket from 'ws';
 
 const webServer = express();
 const PORT = 7780;
-const PORT2 = 7781;
+const WS_PORT = 7781;
 const API = '/api';
 const CORS_OPTIONS = {
   origin: '*', // разрешаем запросы с любого origin, вместо * здесь может быть ОДИН origin
@@ -21,8 +21,34 @@ const historyPath = path.join(__dirname, 'data/history.json');
 const uploadDataPath = path.join(__dirname, 'data/upload-data.json');
 const uploadDirPath = path.join(__dirname, 'uploaded');
 
-// const socketServer = new WebSocket.Server({ port: PORT2});
-// logLineAsync(`Websocket server has been started on port ${PORT2}`);
+const webSocketServer = new WebSocket.Server({ port: WS_PORT});
+logLineAsync(`Websocket server has been created on port ${WS_PORT}`);
+let webSocketClients = [];
+
+webSocketServer.on('connection', connection => {
+  logLineAsync(`${WS_PORT} new websocket connection established`);
+  let newClient;
+  
+  connection.on('message', data => {
+    const message = data.toString();
+    if (message.startsWith('TOKEN')) {
+      if (webSocketClients.some(client => client.token === message)) {
+        connection.terminate();
+        logLineAsync(`[${WS_PORT}] there are too many connections for client ${message}. Connection was terminated`, logPath);
+      } else {
+        newClient = { connection, token: message, keepAliveTo: addTimeFromNow(5), active: true };
+        webSocketClients.push(newClient);
+        logLineAsync(`[${WS_PORT}] new client ${newClient.token} was added`, logPath);
+      }
+    } else {
+      logLineAsync(`[${WS_PORT}] message from client received. Message: ${shortMessage(message)}`, logPath);
+    }
+  });
+  
+  connection.on('error', error => {
+    logLineAsync(`[${WS_PORT}] Error: ${shortMessage(error, 50)}`, logPath);
+  });
+});
 
 webServer.use(express.urlencoded({ extended: true }));
 webServer.use(express.json({ extended: true }));
@@ -183,9 +209,6 @@ webServer.post(`${API}/requests`, async (req, res) => {
 webServer.options(`${API}/upload-file`, cors(CORS_OPTIONS));
 
 webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
-  const totalRequestLength = +req.headers['content-length'];
-  let totalDownloaded = 0;
-  
   let uploadData;
   if (fs.existsSync(uploadDataPath)) {
     try {
@@ -199,6 +222,15 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
     uploadData = [];
   }
   
+  const token = req.headers['custom-token'];
+  const totalFileLength = +req.headers['file-length'];
+  
+  const webSocketClient = webSocketClients.find(client => client.token === token);
+  if (webSocketClient) {
+    logLineAsync(`[${WS_PORT}] started to send data for client ${token}`, logPath);
+  }
+  
+  let totalDownloaded = 0;
   let reqFields = {};
   let reqFiles = {};
   let newFileName;
@@ -217,21 +249,27 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
     } while (fs.existsSync(newFilePath));
     
     reqFiles[newFileName] = { originalName, newFilePath };
-  
     logLineAsync(`[${PORT}] uploading of ${originalName} started`, logPath);
   
     const writeStream = fs.createWriteStream(newFilePath);
-
     file.pipe(writeStream);
   
     file.on('data', data => {
       totalDownloaded += data.length;
-      console.log(`loaded ${totalDownloaded} bytes of ${totalRequestLength}`);
+      if (webSocketClient) {
+        const progress = Math.round(totalDownloaded / totalFileLength * 100);
+        webSocketClient.connection.send(`progress:${progress}`);
+        webSocketClient.keepAliveTo = addTimeFromNow(3);
+      }
     });
 
     file.on('end', () => {
       logLineAsync(`[${PORT}] file ${originalName} was received`, logPath);
       reqFiles[newFileName].totalLength = totalDownloaded;
+      
+      if (webSocketClient) {
+        logLineAsync(`[${WS_PORT}] finished to send data for client ${token}`, logPath);
+      }
     });
   });
   
@@ -244,9 +282,23 @@ webServer.post(`${API}/upload-file`, busboy(), async (req, res) => {
       logLineAsync(`[${PORT}] upload data file was successfully updated`, logPath);
     } catch (e) {
       logLineAsync(`[${PORT}] error of saving upload data`, logPath);
+      return res.status(422).end;
     }
   
-    res.end();
+    if (webSocketClient) {
+      webSocketClient.connection.terminate();
+      logLineAsync(`[${WS_PORT}] connection with client ${token} was closed`, logPath);
+      webSocketClient.active = false;
+    }
+    
+    const data = {
+      id: newFileName,
+      comment: reqFiles[newFileName].comment,
+      originalName: reqFiles[newFileName].originalName,
+      totalLength: reqFiles[newFileName].totalLength,
+    };
+    
+    res.status(200).send(data).end();
   });
 });
 
@@ -257,3 +309,14 @@ webServer.get('*', (req, res) => {
 webServer.listen(PORT, () => {
   logLineAsync(`Backend server has been started on port ${PORT} in ${process.env.NODE_ENV} mode ......`, logPath);
 });
+
+setInterval(() => {
+  webSocketClients = webSocketClients.filter(client => client.active);
+  webSocketClients.forEach(client => {
+    if (Date.now() > client.keepAliveTo) {
+      client.connection.terminate();
+      client.active = false;
+      logLineAsync(`[${WS_PORT}] connection with client ${client.token} was closed due to inactivity`, logPath);
+    }
+  });
+}, 1000);

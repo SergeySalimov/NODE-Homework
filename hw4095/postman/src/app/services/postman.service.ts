@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { HistoryDto, RequestDto, ResponseDto } from '../interfaces/interfaces.dto';
+import { HistoryDto, RequestDto, ResponseDto, UploadFileDto } from '../interfaces/interfaces.dto';
 import { finalize } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class PostmanService {
-  $isLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private $isLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   isLoaded$: Observable<boolean> = this.$isLoaded.asObservable();
   private $history: BehaviorSubject<HistoryDto> = new BehaviorSubject<HistoryDto>([]);
   history$: Observable<HistoryDto> = this.$history.asObservable();
   private $response: Subject<ResponseDto> = new Subject<ResponseDto>();
   response$: Observable<ResponseDto> = this.$response.asObservable();
+  private $uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  uploadProgress$: Observable<number> = this.$uploadProgress.asObservable();
+  private $disableLoadButton: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  disableLoadButton$: Observable<boolean> = this.$disableLoadButton.asObservable();
 
   rootURL = '/api';
 
@@ -42,15 +47,51 @@ export class PostmanService {
     );
   }
 
-  uploadFiles(file: File, comment: string): any {
-    const formData = new FormData();
+  uploadFiles(file: File, comment: string): Observable<UploadFileDto> {
+    this.$disableLoadButton.next(true);
+
+    const formData: FormData = new FormData();
+    const fileLength: string = file.size.toString();
 
     formData.append('file', file);
     formData.append('comment', comment);
 
-    return this.http.post(
+    // ToDo need to add here real session token
+    const sessionToken: string = 'TOKEN:' + (Date.now().toString(36) + Math.random().toString(36).substring(2, 15));
+
+    // open webSocket
+    const wsUrl: string = environment.webSocketUrl;
+    const connection: WebSocket = new WebSocket(wsUrl);
+
+    connection.onopen = () => {
+      connection.send(sessionToken);
+    };
+    connection.onmessage = (event) => {
+      const message: string = event.data;
+      if (message.startsWith('progress:')) {
+        const progress: string = message.slice(9);
+        this.$uploadProgress.next(+progress);
+      }
+    };
+    connection.onerror = (event) => {
+      // ToDo add show toast here
+      console.log('error on webSocket: ', event);
+    };
+
+    return this.http.post<UploadFileDto>(
       `${this.rootURL}/upload-file`,
       formData,
-      ).subscribe();
+      {
+        headers: {
+          'custom-token': sessionToken,
+          'file-length': fileLength,
+        },
+      },
+    ).pipe(
+      finalize(() => {
+        this.$disableLoadButton.next(false);
+        connection.close();
+      }),
+    );
   }
 }
