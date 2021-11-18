@@ -14,7 +14,7 @@ export class StoragePageUploadComponent implements OnInit, OnDestroy {
   progress$: Observable<number> = this.ps.uploadProgress$;
   disableUploadButton$: Observable<boolean> = this.ps.disableLoadButton$;
   private destroy$ = new Subject<void>();
-  uploadStatus: UploadStatusEnum = UploadStatusEnum.READY;
+  uploadStatus: UploadStatusEnum;
   uploadForm: FormGroup;
   files: File[];
 
@@ -26,6 +26,7 @@ export class StoragePageUploadComponent implements OnInit, OnDestroy {
       files: [null, Validators.required],
       comments: [''],
     });
+    this.uploadStatus = UploadStatusEnum.READY;
   }
 
   getClassForProgressBar(): string {
@@ -43,12 +44,15 @@ export class StoragePageUploadComponent implements OnInit, OnDestroy {
   }
 
   onSubmitUpload(): void {
-    const {comments} = this.uploadForm.getRawValue();
+    this.uploadStatus = UploadStatusEnum.PROGRESS;
+    const { comments } = this.uploadForm.getRawValue();
+    this.uploadForm.disable();
     this.ps.uploadFiles(this.files[0], comments).pipe(
       finalize(() => {
         setTimeout(() => this.uploadStatus = UploadStatusEnum.DONE, 500);
         this.uploadForm.reset({ files: null, comments: ''});
         this.ps.getUploadFileList();
+        this.uploadForm.enable();
       }),
       takeUntil(this.destroy$),
     ).subscribe();
@@ -59,6 +63,7 @@ export class StoragePageUploadComponent implements OnInit, OnDestroy {
   }
 
   resetUploadProgress(): void {
+    this.uploadStatus = UploadStatusEnum.READY;
     this.ps.$uploadProgress.next(0);
   }
 
