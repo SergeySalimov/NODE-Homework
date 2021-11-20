@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <h1 class="text-center my-3">SQL Explorer</h1>
+            <h2 class="text-center my-4 pt-1">Searching in: <b>"{{DATA_BASE}}"</b></h2>
+
+            {{{body}}}
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+
+<script>
+    const URL = '{{serverUrl}}';
+    const sqlInput = document.getElementById('sql-input');
+    const sqlOutput = document.getElementById('sql-output');
+    const buttonSend = document.getElementById('button-send');
+    const buttonClear = document.getElementById('button-clear');
+    const spinner = document.getElementById('spinner');
+
+    function disableButtons(state) {
+        buttonSend.disabled = state;
+        buttonClear.disabled = state;
+    }
+
+    sqlInput.addEventListener('input', (event) => disableButtons(!event.target.value));
+
+    async function handleSQLRequest() {
+        const sqlRequest = sqlInput.value;
+        if (sqlRequest === '') {
+            return;
+        }
+
+        buttonSend.disabled = true;
+        spinner.style.display = 'inline-block';
+
+        const fetchOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json', // в ответ ожидаем данные в формате JSON
+            },
+            body: JSON.stringify({ sqlRequest }),
+        };
+
+        const response = await fetch(URL + '/sql', fetchOptions);
+
+        if (response.ok) {
+            const data = await response.json();
+            let infoText;
+            clearOutputArea();
+
+            if ('fields' in data && 'results' in data) {
+                infoText = `received table of data, quantity of line: ${data.results.length} ...`;
+                const table = document.createElement('div');
+                table.innerHTML = createTable(data.results);
+
+                sqlOutput.append(table);
+
+            } else if ('results' in data) {
+                const { affectedRows, changedRows, fieldCount, insertId, message, warningCount, serverStatus } = data.results;
+                infoText = `SQL request complete. Information for user: affectedRows - ${affectedRows},
+                 changedRows - ${changedRows},
+                 fieldCount - ${fieldCount},
+                 insertId - ${insertId},
+                 message - ${message ? message : 'no message'},
+                 warningCount - ${warningCount},
+                 serverStatus - ${serverStatus}.`;
+
+            } else {
+                infoText = 'SQL request completed, but there are no data to show';
+            }
+
+            const infoMessage = document.createElement('div');
+            infoMessage.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>INFO: </strong>${infoText}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                `;
+
+            sqlOutput.prepend(infoMessage);
+
+        } else {
+            let errorMessageText;
+            switch (response.status) {
+                case 400:
+                    errorMessageText = 'Bad http request!';
+                    break;
+                case 500:
+                    errorMessageText = 'Database doesn\'t work';
+                    break;
+                case 501:
+                    errorMessageText = 'Bad sql request!';
+                    break;
+                default:
+                    errorMessageText = 'Unknown error occurred!';
+            }
+
+            const errorMessage = document.createElement('div');
+            errorMessage.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>ERROR! </strong>${errorMessageText}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            `;
+
+            sqlOutput.prepend(errorMessage);
+        }
+
+        buttonSend.disabled = false;
+        spinner.style.display = 'none';
+    }
+
+    function clearTextArea() {
+        sqlInput.value = '';
+        disableButtons(true);
+    }
+
+    function clearOutputArea() {
+        sqlOutput.innerHTML = '';
+    }
+
+    function createTableHead(data) {
+        const headerName = Object.keys(data);
+        let res = '';
+        res += '<thead>';
+        res += '<tr>';
+        res += '<th scope="col">#</th>';
+        headerName.forEach(name => res += `<th scope="col">${name}</th>`);
+        res += '</tr>';
+        res += '</thead>';
+
+        return res;
+    }
+
+    function createTableData(data) {
+        let res = '';
+        res += '<tbody>';
+        data.forEach((line, i) => {
+            const lineData = Object.values(line);
+            res += '<tr>';
+            res += `<th scope="row">${i + 1}</th>`;
+            lineData.forEach(value => res += `<td>${value}</td>`);
+            res += '</tr>';
+        });
+        res += '</tbody>';
+
+        return res;
+    }
+
+    function createTable(data) {
+        let res = '';
+        res += '<table class="table">';
+        res += createTableHead(data[0]);
+        res += createTableData(data);
+        res += '</table>';
+
+        return res;
+    }
+</script>
+</html>

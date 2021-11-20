@@ -1,0 +1,37 @@
+<div class="mb-3">
+    <label for="sql-input" class="form-label">Please input SQL request</label>
+    <textarea class="form-control" id="sql-input" rows="4" required>
+    </textarea>
+    <div class="text-end">
+        <button type="button"
+                id="button-send"
+                class="btn btn-primary mt-3"
+                onclick="handleSQLRequest()"
+                disabled
+        >
+            <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+            Send SQL request
+        </button>
+        <button type="button"
+                class="btn btn-danger mt-3"
+                id="button-clear"
+                onclick="clearTextArea()"
+                disabled
+        >Clear
+        </button>
+    </div>
+</div>
+
+<hr class="dropdown-divider my-4">
+
+<div class="my-2">
+    <h6 class="text-center">Result</h6>
+
+    <div id="sql-output">
+        <div>
+
+        </div>
+
+    </div>
+</div>
+

@@ -87,6 +87,10 @@ function messageLog(msg) {
   return console.log(`${getDateTimeLog()} ${msg}`);
 }
 
+function shortMessage(message, cutOn = 15) {
+  return message.length > cutOn ? `${message.slice((cutOn - 3))}...` : message;
+}
+
 module.exports = {
   logLineSync,
   logLineAsync,
@@ -95,4 +99,5 @@ module.exports = {
   checkIdValidity,
   getDateTimeLog,
   messageLog,
+  shortMessage,
 };
